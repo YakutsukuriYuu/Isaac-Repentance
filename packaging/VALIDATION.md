@@ -19,6 +19,17 @@ implied by generating a native project or an installer.
 
 ## Platform status
 
+GitHub acceptance on 2026-11-03: [complete installer run 41649039937](https://github.com/YakutsukuriYuu/Isaac-Repentance/actions/runs/41649039937)
+completed successfully for Android, iOS, macOS ARM64 and macOS Intel x64.
+
+- Android: actual APK compilation, complete payload validation and artifact upload passed.
+- iOS: Xcode **27.1** produced an unsigned device IPA; all 35 game/core files were
+  verified inside it before upload.
+- Both macOS architectures: DMG compilation, read-only mounting, resource/core
+  checksums, strict code-signature checks, embedded launcher verification and upload passed.
+- [Source validation run 41648096762](https://github.com/YakutsukuriYuu/Isaac-Repentance/actions/runs/41648096762)
+  passed on the independent Linux runner.
+
 Local acceptance on 2026-11-03:
 
 - A freshly exported source checkout passed all nine source-validation groups
@@ -42,9 +53,9 @@ Local acceptance on 2026-11-03:
 
 Detailed local acceptance results are generated under ignored report directories.
 The desktop real-game smoke test is `packaging/desktop/test/smoke.mjs`.
-The iOS binary build requires Xcode 27; the development Mac currently has only
-Command Line Tools. GitHub runner execution requires repository authentication
-and the configured private-resource download secret.
+The iOS binary build requires Xcode 27; the development Mac has only Command Line
+Tools, so device-IPA compilation was performed on GitHub. The private-resource
+download secret has been configured and verified by the complete build above.
 
 Physical iPhone 17/iPad mini 7 and Android gameplay, peak memory, long sessions,
 audio recovery and background persistence remain device acceptance tasks.

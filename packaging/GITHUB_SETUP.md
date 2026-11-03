@@ -43,6 +43,12 @@ Source validation needs none of these. Run the installer workflow manually first
 Targets are `all`, `android`, `ios`, and `macos`. Without distribution credentials,
 the workflow produces a debug-signed APK, unsigned device IPA, and ad hoc Mac DMGs.
 
+For a private download failure, run **Actions → Check private runtime access**.
+It checks the supplied Actions Secret against account, repository, asset metadata,
+and download endpoints. It prints sanitized status information, never the Token,
+download URL, redirect URL or raw API responses. A successful local CLI login does
+not establish that the separately configured Actions Token has resource access.
+
 ## Android release signing
 
 Set these secrets to keep app updates compatible:

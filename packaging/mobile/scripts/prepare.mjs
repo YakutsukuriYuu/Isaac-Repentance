@@ -68,5 +68,14 @@ if (platform === 'android') {
   }
   await writeFile(project, text);
   await copyFile('PrivacyInfo.xcprivacy', 'ios/App/App/PrivacyInfo.xcprivacy');
+  // Capacitor derives this platform from the Xcode deployment target on later
+  // syncs, but emits .v27 with a 5.9 tools manifest. The enum requires 6.4;
+  // the string initializer supports the same target with the pinned template.
+  const swiftPackage = 'ios/App/CapApp-SPM/Package.swift';
+  if (await exists(swiftPackage)) {
+    const manifest = await readFile(swiftPackage, 'utf8');
+    if (!/platforms: \[\.iOS\(/.test(manifest)) throw new Error('Review the generated Swift Package deployment target');
+    await writeFile(swiftPackage, manifest.replace(/platforms: \[[^\n]+\],/, 'platforms: [.iOS("27.0")],'));
+  }
 }
 console.log(`Prepared ${platform}: bundled game resources, native DAT storage and Chinese launcher.`);

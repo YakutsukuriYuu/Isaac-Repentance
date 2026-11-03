@@ -7,6 +7,11 @@
       "sha256": "92a13f5a3cab570fc33f3e38c0cd3dc5802b8c5476e5f0d8cc6e0bf1998b8880"
     },
     {
+      "path": ".github/workflows/check-runtime-access.yml",
+      "bytes": 565,
+      "sha256": "636fbf0b83a06c8dcf156ec9a5bb562620f17aa853bdcd9f64ecb740239e6cf2"
+    },
+    {
       "path": ".github/workflows/validate-source.yml",
       "bytes": 1428,
       "sha256": "1806ecd40b2ece7e3b12fcc9e1be5c6a006ccd5ee9a88be33ca0c5ad0f0a5a61"
@@ -128,8 +133,8 @@
     },
     {
       "path": "packaging/GITHUB_SETUP.md",
-      "bytes": 4791,
-      "sha256": "e73c5700239305e5762047e2358792a9f76f00637ee278a13c7da3fb2610e131"
+      "bytes": 5201,
+      "sha256": "8f664a6cf5f92401c829fd481b14fc808be94af9ef0de2ef2349956e49d88c56"
     },
     {
       "path": "packaging/SOURCE_README.md",
@@ -138,8 +143,8 @@
     },
     {
       "path": "packaging/VALIDATION.md",
-      "bytes": 2960,
-      "sha256": "87b15cf0b209ef2633ed581f1d1b8b78c18d5c2a1656a1589dcf125e79f315c5"
+      "bytes": 3750,
+      "sha256": "b9dbe980584966a2216c90752fc34a68c92a59bfd117b3609a0c7833ee240374"
     },
     {
       "path": "packaging/desktop/README.md",
@@ -228,8 +233,8 @@
     },
     {
       "path": "packaging/mobile/scripts/prepare.mjs",
-      "bytes": 7902,
-      "sha256": "b6bc44728abb0f3ab48b9a644e97dee566648a5c52fd2fc3b516c96ff798c3ff"
+      "bytes": 8525,
+      "sha256": "d60cffac6336d7fca2fb727918d78743169df6a75bdda47d61605e3356754a99"
     },
     {
       "path": "packaging/mobile/src/bootstrap.mjs",
@@ -257,6 +262,11 @@
       "sha256": "6013b97dbf46e17f26f51e427b89d12109dd48cb4c48d3d45a484b1ffe6c5b83"
     },
     {
+      "path": "packaging/scripts/probe_runtime_access.py",
+      "bytes": 9639,
+      "sha256": "d9fecbe84ba4dda9c097fe1ec26889035fa4cb5fef6462dc5827fcb93f2bfdfb"
+    },
+    {
       "path": "packaging/scripts/runtime_inputs.py",
       "bytes": 16565,
       "sha256": "3e3c718bc73a57f8d195e5e62ca4ddaac3d48575073d48bb451392c31b485a42"
@@ -275,6 +285,11 @@
       "path": "packaging/scripts/verify_installer.py",
       "bytes": 5390,
       "sha256": "aeaca4fbc9212318e10780061ab7d6d20ee79e858fe5dbf653fc4835e78945db"
+    },
+    {
+      "path": "packaging/tests/test_probe_runtime_access.py",
+      "bytes": 8423,
+      "sha256": "4f0ece510196753a5d57a5b0d7db69643091f018ddc0cc8cfe1fdeb6dc236755"
     },
     {
       "path": "packaging/tests/test_runtime_inputs.py",
