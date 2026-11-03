@@ -37,23 +37,32 @@ from this source export.
 
 ## Build on GitHub
 
+Download complete installers from
+[the latest Release](https://github.com/YakutsukuriYuu/Isaac-Repentance/releases/latest).
+Release downloads do not require a GitHub login and do not expire after seven days.
+
 See [GitHub setup](packaging/GITHUB_SETUP.md) for resource storage,
 credentials, signing, and the first Actions run.
 
 1. Store the private runtime archive outside this public source repository.
 2. Set repository secret `ISAAC_RUNTIME_URL` and, for a private GitHub Release
    asset, `ISAAC_RUNTIME_TOKEN` with read access to that resource repository.
+   Configure the persistent Android signing secrets described in the setup guide;
+   automatic Releases require a release-signed APK.
 3. Open **Actions → Build complete installers → Run workflow** and choose a target.
-4. Download the resulting complete installer from the workflow artifacts.
+4. With target `all`, download the complete installers from **Releases** after all
+   platforms succeed. Single-platform runs upload only Actions artifacts.
 5. After the first successful build, set repository variable
    `ISAAC_BUILD_ON_PUSH=true` to build automatically on pushes to `main`.
-   Version tags matching `v*` also trigger installer builds.
+   Successful full builds publish `build-<workflow run number>` Releases.
+   Version tags matching `v*` also trigger builds and publish under that version tag.
 
 Source tests run on pushes and pull requests without private inputs. Installer
 builds never run for pull requests. Artifacts in this public repository are
 publicly downloadable by users with the required GitHub access; their public
 distribution is intentional. Raw input archives and signing material are not
-uploaded as artifacts. This workflow does not automatically publish a Release.
+uploaded as artifacts. The publisher uploads APK, IPA, ARM64/x64 DMGs and a SHA-256
+checksum file to a draft, verifies the uploads, then makes the Release public.
 
 ## Installation and runtime requirements
 

@@ -14,6 +14,8 @@ implied by generating a native project or an installer.
   interrupted writes, committed generations, Mod install/remove and retention.
 - Desktop shell: child process lifecycle, ready notifications, navigation isolation,
   save flush before closing and startup failures.
+- Release publisher: complete four-platform inventory, source/tag identity, SHA-256
+  upload verification, interrupted draft recovery and published-asset preservation.
 - Final APK/IPA: bundled bootstrap, core and all game resources verified against
   pinned metadata. This is not a native-device gameplay test.
 

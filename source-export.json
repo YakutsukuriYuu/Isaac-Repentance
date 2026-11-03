@@ -3,8 +3,8 @@
   "files": [
     {
       "path": ".github/workflows/build-installers.yml",
-      "bytes": 8836,
-      "sha256": "92a13f5a3cab570fc33f3e38c0cd3dc5802b8c5476e5f0d8cc6e0bf1998b8880"
+      "bytes": 9941,
+      "sha256": "339432abb395151c76f492d917996fbff3cd3244336a98159e37aa0ece35a323"
     },
     {
       "path": ".github/workflows/check-runtime-access.yml",
@@ -133,18 +133,18 @@
     },
     {
       "path": "packaging/GITHUB_SETUP.md",
-      "bytes": 5201,
-      "sha256": "8f664a6cf5f92401c829fd481b14fc808be94af9ef0de2ef2349956e49d88c56"
+      "bytes": 6980,
+      "sha256": "9b1ade26e759c0ea5c2b6b8615a35db2cb7567fd94f41b1690cf0544eff38a7a"
     },
     {
       "path": "packaging/SOURCE_README.md",
-      "bytes": 6942,
-      "sha256": "d65bc02478d31962c6475cb1d996344d547ef3fe4d6ff5afad001d68919a57b9"
+      "bytes": 7551,
+      "sha256": "c3f2c09deaa903437841a0c34b4ea2e5e35646daca49cbc2bd0b95215a1f4efa"
     },
     {
       "path": "packaging/VALIDATION.md",
-      "bytes": 3750,
-      "sha256": "b9dbe980584966a2216c90752fc34a68c92a59bfd117b3609a0c7833ee240374"
+      "bytes": 3918,
+      "sha256": "b94e0ad8949b360f3eadd658e249165981496acd0604f86d5ade104532cdf761"
     },
     {
       "path": "packaging/desktop/README.md",
@@ -267,6 +267,11 @@
       "sha256": "d9fecbe84ba4dda9c097fe1ec26889035fa4cb5fef6462dc5827fcb93f2bfdfb"
     },
     {
+      "path": "packaging/scripts/publish_release.py",
+      "bytes": 13276,
+      "sha256": "6d8b039e46f6aeeb6572312f2726065e8e4bf82d8a6f8fabe9954d8e616d60a3"
+    },
+    {
       "path": "packaging/scripts/runtime_inputs.py",
       "bytes": 16565,
       "sha256": "3e3c718bc73a57f8d195e5e62ca4ddaac3d48575073d48bb451392c31b485a42"
@@ -290,6 +295,11 @@
       "path": "packaging/tests/test_probe_runtime_access.py",
       "bytes": 8423,
       "sha256": "4f0ece510196753a5d57a5b0d7db69643091f018ddc0cc8cfe1fdeb6dc236755"
+    },
+    {
+      "path": "packaging/tests/test_publish_release.py",
+      "bytes": 13818,
+      "sha256": "f062d6d234ac9e13962f12f3db8fcc0f059aee74fe9c3eb6d47ece998ddcb818"
     },
     {
       "path": "packaging/tests/test_runtime_inputs.py",

@@ -201,3 +201,31 @@ jobs:
       - name: Remove temporary signing files
         if: always()
         run: python3 packaging/scripts/signing.py cleanup
+  release:
+    name: Publish complete GitHub Release
+    needs: [android, ios, macos]
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Download verified installers from this build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name Isaac-Repentance-Android \
+            --name Isaac-Repentance-iOS \
+            --name Isaac-Repentance-macOS-arm64 \
+            --name Isaac-Repentance-macOS-x64 \
+            --dir .release-build/artifacts
+      - name: Publish installers and checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISAAC_APPLE_SIGNED: ${{ inputs.signing && '1' || '0' }}
+        run: python3 packaging/scripts/publish_release.py --artifacts .release-build/artifacts
