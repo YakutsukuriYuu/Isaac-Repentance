@@ -1,0 +1,360 @@
+{
+  "format": "isaac-source-export-v1",
+  "files": [
+    {
+      "path": ".github/workflows/build-installers.yml",
+      "bytes": 8793,
+      "sha256": "9baefdeec67913fc97c44ce50556f5a58c68d016e72a891e2234aa196f18adce"
+    },
+    {
+      "path": ".github/workflows/validate-source.yml",
+      "bytes": 1428,
+      "sha256": "1806ecd40b2ece7e3b12fcc9e1be5c6a006ccd5ee9a88be33ca0c5ad0f0a5a61"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 750,
+      "sha256": "4ad220ea8b642dd4334184c7dd530a4616d7c50a4d6bf4efd8876aee8fec40dc"
+    },
+    {
+      "path": "Isaac-Repentance/project/THIRD_PARTY_NOTICES.md",
+      "bytes": 1655,
+      "sha256": "ae2dac0d4ba8a538cacda0ca0c3a836e1ca417a96c4aeea4957da5305d47481e"
+    },
+    {
+      "path": "Isaac-Repentance/project/licenses/Emscripten-LICENSE",
+      "bytes": 5093,
+      "sha256": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86"
+    },
+    {
+      "path": "Isaac-Repentance/project/licenses/Go-LICENSE",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "Isaac-Repentance/project/licenses/Lua-lua.h",
+      "bytes": 14833,
+      "sha256": "e73249bfcd496bc3def417d95585c3f3f2dc77f926bc3d5e3582f869de7953d6"
+    },
+    {
+      "path": "Isaac-Repentance/project/licenses/libdeflate-COPYING",
+      "bytes": 1078,
+      "sha256": "4ad69099cb4374836fd27583d9991e2838cd86b6e4666ab26b2d32582c91e73a"
+    },
+    {
+      "path": "Isaac-Repentance/project/licenses/musl-LICENSE",
+      "bytes": 1067,
+      "sha256": "e239ef69c9c4eead9406bdc6a34f2bd1220c3dcd3b17c8377cb2fb73fdaf0d38"
+    },
+    {
+      "path": "Isaac-Repentance/project/licenses/repentogxm-LICENSE",
+      "bytes": 17984,
+      "sha256": "edaef632cbb643e4e7a221717a6c441a4c1a7c918e6e4d56debc3d8739b233f6"
+    },
+    {
+      "path": "Isaac-Repentance/project/licenses/stb_vorbis.c",
+      "bytes": 187253,
+      "sha256": "9903a2f3ba38c2315e90bcc5ec2b0bbfcf9a96a6983625db8957d5809ee3be05"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/app.mjs",
+      "bytes": 38315,
+      "sha256": "8ab434cc874f66b2f45cf30aff73254201b89700f7a07e3e061efa60b1eea471"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/disk_storage.mjs",
+      "bytes": 14171,
+      "sha256": "3f750e1bb033e3e738fbe5b9344f8c1ee1150f95179d4066a6db03828cacce4b"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/fps_metrics.mjs",
+      "bytes": 2862,
+      "sha256": "735c5acdb4601a14b47aae6c35da817541b28c80f889f6325c6534fac171c5d7"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/index.html",
+      "bytes": 18998,
+      "sha256": "d7e0eb10bc08149d2e2c1ac5e5aa82e62e3fb83fb7881744cf65369d9a9e8c5c"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/mod_helpers.mjs",
+      "bytes": 15526,
+      "sha256": "79ca6aa162d311f6fcdd71e93bc39bc27b82ea350b5438d4d28350576d5206c3"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/save_helpers.mjs",
+      "bytes": 11745,
+      "sha256": "d9012758d0c606dbeacc47051ac3704ac32d920d0bc100ad82a7e33f06ffdf31"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/styles.css",
+      "bytes": 32703,
+      "sha256": "599705f2bc7881548f808a3680d006b7864af87b2c278bf6e7f076102035388f"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/test_disk_storage.mjs",
+      "bytes": 7540,
+      "sha256": "de1a57373480e36204e79084a373dd8c07545fe8cc3eb00829551b4ea9f21fd3"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/test_fps_metrics.mjs",
+      "bytes": 6252,
+      "sha256": "509adf16c8bfc221c78564ebef260eb6070bf10b8c7371ac16ded224d3ef8d85"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/test_mod_helpers.mjs",
+      "bytes": 11723,
+      "sha256": "ff9bf668427da33d0c794a0d4b82bfe93aa8e7e23ec16c2e05fd8f718f43493a"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/test_save_helpers.mjs",
+      "bytes": 12090,
+      "sha256": "57a5ee4c05a722dc802f76a98fe910b11ac991de62ccffb5dc8a1d096a92e08f"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/test_session_controls.mjs",
+      "bytes": 14374,
+      "sha256": "d8758d64704b5abd7ded97611b5f2e5f17fb7a83d015af938551bf3dbd682838"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/touch_controls.mjs",
+      "bytes": 4467,
+      "sha256": "f49f8f690a7911eb9ac9fa54a4f1edcb47941066b0f3c4a3add5554e141208b9"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/touch_layout.mjs",
+      "bytes": 12618,
+      "sha256": "a7c69fbfa053eb2e00ea4bd0118b3ca68cfaab7bd0f1bca11d072335a8f88915"
+    },
+    {
+      "path": "packaging/GITHUB_SETUP.md",
+      "bytes": 4791,
+      "sha256": "e73c5700239305e5762047e2358792a9f76f00637ee278a13c7da3fb2610e131"
+    },
+    {
+      "path": "packaging/SOURCE_README.md",
+      "bytes": 6942,
+      "sha256": "d65bc02478d31962c6475cb1d996344d547ef3fe4d6ff5afad001d68919a57b9"
+    },
+    {
+      "path": "packaging/VALIDATION.md",
+      "bytes": 2960,
+      "sha256": "87b15cf0b209ef2633ed581f1d1b8b78c18d5c2a1656a1589dcf125e79f315c5"
+    },
+    {
+      "path": "packaging/desktop/README.md",
+      "bytes": 2517,
+      "sha256": "36fb25ae2f8e5fed1f12fb259c0898b5ac6e999664790609073eb8c7cda8168d"
+    },
+    {
+      "path": "packaging/desktop/build.mjs",
+      "bytes": 3640,
+      "sha256": "f8dd3ddac3f40fbde3f777c2d819e7d5079aec9e3274dd404822d9e8b99d437e"
+    },
+    {
+      "path": "packaging/desktop/entitlements.adhoc.plist",
+      "bytes": 309,
+      "sha256": "4752594023cc0eb2c8232ae959546dc0eae11454458150e8cba15fc77c959624"
+    },
+    {
+      "path": "packaging/desktop/entitlements.mac.plist",
+      "bytes": 240,
+      "sha256": "caae59d69aca7ef6faaf8b9e7873c8a253774a304819111b572029424ab9f5f4"
+    },
+    {
+      "path": "packaging/desktop/main.mjs",
+      "bytes": 5422,
+      "sha256": "882ddbcaf12ccf93e8fcc8e58a80b2d29cd5e06c7de48b6cde2b07c8f4e4efd2"
+    },
+    {
+      "path": "packaging/desktop/package-lock.json",
+      "bytes": 127582,
+      "sha256": "4b8110fc78a3797c690cb55bfefeb8e416cc5a33178fd472eac25a38aa1f28bf"
+    },
+    {
+      "path": "packaging/desktop/package.json",
+      "bytes": 548,
+      "sha256": "6116960e147e41328cb326d75d4f77a046dcb8e3d5d836539a9369fec4c6f233"
+    },
+    {
+      "path": "packaging/desktop/runtime-server.mjs",
+      "bytes": 3785,
+      "sha256": "7849038496a1b2c0946fd1685b199224e503a71aa4c364d041092c20df886d5f"
+    },
+    {
+      "path": "packaging/desktop/test/runtime-server.test.mjs",
+      "bytes": 3933,
+      "sha256": "8b850fdaa4a578f3986a5aec220afc23e25c5b2448b82a1d4eb1332d292f2add"
+    },
+    {
+      "path": "packaging/desktop/test/smoke.mjs",
+      "bytes": 6343,
+      "sha256": "0716aa8ac2cd28aef8c1ec077f995004c96e2b5348a5b25ce4c2c939df931c1f"
+    },
+    {
+      "path": "packaging/mobile/PrivacyInfo.xcprivacy",
+      "bytes": 527,
+      "sha256": "631cec2c8181d5c85a298eb0f7844c369fa2e8bef2c52bcba6f6db6bd791cb5e"
+    },
+    {
+      "path": "packaging/mobile/README.md",
+      "bytes": 5770,
+      "sha256": "91b856671e1a627dc835bf5c7026b4cc4b89d9f4891c7dd3655364341c580ad8"
+    },
+    {
+      "path": "packaging/mobile/capacitor.config.json",
+      "bytes": 417,
+      "sha256": "a3fc8f157109993b2469a8adf60f1903236042299f577850adfe2740f4e056bf"
+    },
+    {
+      "path": "packaging/mobile/package-lock.json",
+      "bytes": 58634,
+      "sha256": "20fd64b4e77e29504f27efd3f13b424086ba6f07e1393cb4ca9d655afd7c6633"
+    },
+    {
+      "path": "packaging/mobile/package.json",
+      "bytes": 642,
+      "sha256": "45df4e99630487e919a4c99a3722d5117672a83ce5b92b831f1bdb1e25d09404"
+    },
+    {
+      "path": "packaging/mobile/scripts/build-android.mjs",
+      "bytes": 1458,
+      "sha256": "29bb56866c4e1e66f25371b02945fa0809ed9f2683e5d1717579835806e3c3ed"
+    },
+    {
+      "path": "packaging/mobile/scripts/build-ios.mjs",
+      "bytes": 3216,
+      "sha256": "f0b93941a9e33ea52f4a13106dd4bcc6bacdfa58a7e88cdc2e065bd393694342"
+    },
+    {
+      "path": "packaging/mobile/scripts/prepare.mjs",
+      "bytes": 7902,
+      "sha256": "b6bc44728abb0f3ab48b9a644e97dee566648a5c52fd2fc3b516c96ff798c3ff"
+    },
+    {
+      "path": "packaging/mobile/src/bootstrap.mjs",
+      "bytes": 2603,
+      "sha256": "93ca1ddb39c44ffc966c80ce376eab0ca277e36ea7b86572e4d6fcc6be5c2e52"
+    },
+    {
+      "path": "packaging/mobile/src/native_storage.mjs",
+      "bytes": 10920,
+      "sha256": "9017541e3cae15604d63c7237177eecdd0e35486c402794c47403db25bd59d7b"
+    },
+    {
+      "path": "packaging/mobile/tests/native-storage.test.mjs",
+      "bytes": 7398,
+      "sha256": "86e693b42f48deab51852213c30286fb97cbc84af549b3a16d0ed6354d4495e4"
+    },
+    {
+      "path": "packaging/runtime.lock.json",
+      "bytes": 766,
+      "sha256": "14e67e4ff5208e47f5890d4d18d41c35daf7c476c8c4c2250a6c618022e39fa6"
+    },
+    {
+      "path": "packaging/scripts/export_source.py",
+      "bytes": 5338,
+      "sha256": "6013b97dbf46e17f26f51e427b89d12109dd48cb4c48d3d45a484b1ffe6c5b83"
+    },
+    {
+      "path": "packaging/scripts/runtime_inputs.py",
+      "bytes": 16565,
+      "sha256": "3e3c718bc73a57f8d195e5e62ca4ddaac3d48575073d48bb451392c31b485a42"
+    },
+    {
+      "path": "packaging/scripts/signing.py",
+      "bytes": 5509,
+      "sha256": "3125f02681a349b4de7b175b1f7b6bb5c4299d2d77a212a0a7bf9473a47257ca"
+    },
+    {
+      "path": "packaging/scripts/verify_dmg.py",
+      "bytes": 9239,
+      "sha256": "8463c7bc023edcfafbcf904c44a789d2eda681070ead2fb8018331a169ded1ba"
+    },
+    {
+      "path": "packaging/scripts/verify_installer.py",
+      "bytes": 5390,
+      "sha256": "aeaca4fbc9212318e10780061ab7d6d20ee79e858fe5dbf653fc4835e78945db"
+    },
+    {
+      "path": "packaging/tests/test_runtime_inputs.py",
+      "bytes": 13878,
+      "sha256": "bbc541293379f07dc7549ef830f109151cd74ccc3330d38b0e93ff1289004c7d"
+    },
+    {
+      "path": "packaging/tests/test_source_export.py",
+      "bytes": 5461,
+      "sha256": "937e625a627c05e8f1759cb3f9c52f894e6c03e72bde4b0aa974af23c6eb0892"
+    },
+    {
+      "path": "packaging/tests/test_verify_dmg.py",
+      "bytes": 8105,
+      "sha256": "c94f8d1c1a2a79ef9ab497588ccad4f06332bce73c9bedbe9d07995e18782654"
+    },
+    {
+      "path": "packaging/tests/test_verify_installer.py",
+      "bytes": 8058,
+      "sha256": "782d8b79631b78448338a9154cde9054f5c5cdacc5e36a0edb21486b13829ebd"
+    },
+    {
+      "path": "portable/THIRD_PARTY_NOTICES.md",
+      "bytes": 1655,
+      "sha256": "ae2dac0d4ba8a538cacda0ca0c3a836e1ca417a96c4aeea4957da5305d47481e"
+    },
+    {
+      "path": "portable/launcher/README.md",
+      "bytes": 6377,
+      "sha256": "60b13321c9f7988159ea69cb4512e7d3a2adcc0d9ccb315a46f0c594c1c99527"
+    },
+    {
+      "path": "portable/launcher/development.go",
+      "bytes": 4433,
+      "sha256": "c5a6c39b8ca45ef8f78599b04cac3bc13b8b778202cde0bcfc3084a7771d7de7"
+    },
+    {
+      "path": "portable/launcher/go.mod",
+      "bytes": 42,
+      "sha256": "9cc6803344a6a1e4aaf96739688c36c807300f33c67ac07d5df69fe13ee01363"
+    },
+    {
+      "path": "portable/launcher/lock_unix.go",
+      "bytes": 387,
+      "sha256": "a77c5c75390c4f3140a7d32850c8220f081116970be6bcbb89d34b6e55f98d24"
+    },
+    {
+      "path": "portable/launcher/lock_windows.go",
+      "bytes": 665,
+      "sha256": "105823f7c4d115b245965aa96f4305184fc0137f02099a47d08b33561f2b8b07"
+    },
+    {
+      "path": "portable/launcher/main.go",
+      "bytes": 20027,
+      "sha256": "c9b1399f4448f5df2fdc28307fa5bed0091c171cc32f56297aea2367e17b1271"
+    },
+    {
+      "path": "portable/launcher/main_test.go",
+      "bytes": 14538,
+      "sha256": "a7c4fa99a0cc13338db4c423c31fa2e53aeb046dc6fc837efc8cfba013af6d66"
+    },
+    {
+      "path": "portable/launcher/ready.go",
+      "bytes": 1180,
+      "sha256": "cb3c76f264cee2881daa9ed4d158cbc2c178a5a797b2397482f72d82e2be02df"
+    },
+    {
+      "path": "portable/launcher/storage.go",
+      "bytes": 22931,
+      "sha256": "2f815c945976c0a7c9dc8876af3adfe75b3649939aa4df830372b339ec6bfe2a"
+    },
+    {
+      "path": "portable/launcher/storage_test.go",
+      "bytes": 6534,
+      "sha256": "777b58473803794a50533887e51d0cb56995326ab7a6b5ea2c7116d65f555471"
+    },
+    {
+      "path": "portable/launcher/wrapper_test.go",
+      "bytes": 6540,
+      "sha256": "da175c1ce42ec95e445e7d1a6aaedf6c25d70a4142be5075493111bd148de0b1"
+    }
+  ]
+}

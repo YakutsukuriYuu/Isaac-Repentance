@@ -1,0 +1,203 @@
+name: Build complete installers
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Installer target
+        type: choice
+        options: [all, android, ios, macos]
+        default: all
+      signing:
+        description: Require configured distribution certificates
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    tags: ['v*']
+permissions:
+  contents: read
+concurrency:
+  group: installers-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  android:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && (inputs.platform == 'all' || inputs.platform == 'android')) ||
+      (github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || vars.ISAAC_BUILD_ON_PUSH == 'true'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '24'
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install pinned Android SDK components
+        run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0' 'build-tools;36.0.0'
+      - name: Fetch and verify private runtime
+        env:
+          ISAAC_RUNTIME_URL: ${{ secrets.ISAAC_RUNTIME_URL }}
+          ISAAC_RUNTIME_TOKEN: ${{ secrets.ISAAC_RUNTIME_TOKEN }}
+        run: python3 packaging/scripts/runtime_inputs.py fetch --output .release-build/input
+      - name: Stage complete offline application
+        run: python3 packaging/scripts/runtime_inputs.py stage --project .release-build/input/project --target mobile --output packaging/mobile/www
+      - name: Install pinned mobile tooling
+        working-directory: packaging/mobile
+        run: npm ci
+      - name: Configure Android signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: python3 packaging/scripts/signing.py android
+      - name: Build APK
+        working-directory: packaging/mobile
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          REQUIRE_SIGNING: ${{ inputs.signing && '1' || '0' }}
+        run: npm run build:android
+      - name: Verify complete APK contents
+        run: python3 packaging/scripts/verify_installer.py apk packaging/mobile/output/*.apk
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: Isaac-Repentance-Android
+          path: packaging/mobile/output/*.apk
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+      - name: Remove temporary signing files
+        if: always()
+        run: python3 packaging/scripts/signing.py cleanup
+  ios:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && (inputs.platform == 'all' || inputs.platform == 'ios')) ||
+      (github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || vars.ISAAC_BUILD_ON_PUSH == 'true'))
+    runs-on: xcode-27
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '24'
+      - name: Check Xcode
+        run: xcodebuild -version
+      - name: Fetch and verify private runtime
+        env:
+          ISAAC_RUNTIME_URL: ${{ secrets.ISAAC_RUNTIME_URL }}
+          ISAAC_RUNTIME_TOKEN: ${{ secrets.ISAAC_RUNTIME_TOKEN }}
+        run: python3 packaging/scripts/runtime_inputs.py fetch --output .release-build/input
+      - name: Stage complete offline application
+        run: python3 packaging/scripts/runtime_inputs.py stage --project .release-build/input/project --target mobile --output packaging/mobile/www
+      - name: Install pinned mobile tooling
+        working-directory: packaging/mobile
+        run: npm ci
+      - name: Configure optional iOS signing
+        env:
+          APPLE_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          IOS_PROFILE_BASE64: ${{ secrets.IOS_PROFILE_BASE64 }}
+          IOS_EXPORT_OPTIONS_BASE64: ${{ secrets.IOS_EXPORT_OPTIONS_BASE64 }}
+        run: python3 packaging/scripts/signing.py ios
+      - name: Build device IPA
+        working-directory: packaging/mobile
+        env:
+          IOS_CODE_SIGN_IDENTITY: ${{ vars.IOS_CODE_SIGN_IDENTITY }}
+          REQUIRE_SIGNING: ${{ inputs.signing && '1' || '0' }}
+        run: npm run build:ios
+      - name: Verify complete IPA contents
+        run: python3 packaging/scripts/verify_installer.py ipa packaging/mobile/output/*.ipa packaging/mobile/output/ios-signed/*.ipa
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: Isaac-Repentance-iOS
+          path: packaging/mobile/output/**/*.ipa
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+      - name: Remove temporary signing files
+        if: always()
+        run: python3 packaging/scripts/signing.py cleanup
+  macos:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && (inputs.platform == 'all' || inputs.platform == 'macos')) ||
+      (github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || vars.ISAAC_BUILD_ON_PUSH == 'true'))
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-26
+            arch: arm64
+            goarch: arm64
+          - runner: macos-26-intel
+            arch: x64
+            goarch: amd64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '24'
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: '1.27.3'
+          cache: false
+      - name: Fetch and verify private runtime
+        env:
+          ISAAC_RUNTIME_URL: ${{ secrets.ISAAC_RUNTIME_URL }}
+          ISAAC_RUNTIME_TOKEN: ${{ secrets.ISAAC_RUNTIME_TOKEN }}
+        run: python3 packaging/scripts/runtime_inputs.py fetch --output .release-build/input
+      - name: Stage complete offline application
+        run: python3 packaging/scripts/runtime_inputs.py stage --project .release-build/input/project --target desktop --output packaging/desktop/runtime/project
+      - name: Build embedded launcher
+        working-directory: portable/launcher
+        env:
+          GOOS: darwin
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: '0'
+        run: go build -trimpath -buildvcs=false -ldflags='-s -w' -o ../../packaging/desktop/runtime/isaac-launcher .
+      - name: Install pinned desktop tooling
+        working-directory: packaging/desktop
+        run: npm ci
+      - name: Configure optional macOS signing
+        if: inputs.signing
+        env:
+          MAC_CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
+          APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+        run: python3 packaging/scripts/signing.py macos
+      - name: Build DMG
+        working-directory: packaging/desktop
+        env:
+          ISAAC_ARCH: ${{ matrix.arch }}
+          ISAAC_SIGNING: ${{ inputs.signing && '1' || '0' }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          APPLE_API_KEY_ID: ${{ vars.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+        run: |
+          if [ "$ISAAC_SIGNING" = "1" ]; then
+            node build.mjs --arch "$ISAAC_ARCH" --signed
+          else
+            node build.mjs --arch "$ISAAC_ARCH"
+          fi
+      - name: Verify complete DMG contents
+        env:
+          ISAAC_ARCH: ${{ matrix.arch }}
+        run: python3 packaging/scripts/verify_dmg.py --arch "$ISAAC_ARCH" packaging/desktop/dist/*.dmg
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: Isaac-Repentance-macOS-${{ matrix.arch }}
+          path: packaging/desktop/dist/*.dmg
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+      - name: Remove temporary signing files
+        if: always()
+        run: python3 packaging/scripts/signing.py cleanup

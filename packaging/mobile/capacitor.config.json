@@ -1,0 +1,9 @@
+{
+  "appId": "io.github.yakutsukuriyuu.isaacrepentance",
+  "appName": "Isaac Repentance",
+  "webDir": "www",
+  "server": {"androidScheme": "https", "iosScheme": "capacitor", "hostname": "localhost"},
+  "android": {"allowMixedContent": false, "captureInput": true},
+  "ios": {"contentInset": "never", "scrollEnabled": false, "preferredContentMode": "mobile"},
+  "plugins": {"SplashScreen": {"launchAutoHide": true}}
+}

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#191714">
+  <title>以撒的结合 · 忏悔</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body data-mode="menu">
+  <main id="launcher">
+    <header class="masthead">
+      <a class="wordmark" href="#" data-nav="home" aria-label="返回开始界面"><span class="cross-mark" aria-hidden="true">†</span> THE BINDING OF ISAAC</a>
+      <span class="edition">REPENTANCE <span>1.7.9b</span></span>
+    </header>
+    <div class="menu-content">
+      <section class="menu-page home-page" data-page="home" aria-labelledby="home-title">
+        <div class="home-heading"><p class="eyebrow">THE BASEMENT IS WAITING</p><h1 id="home-title">以撒的结合<span>忏 悔</span></h1><p class="home-caption">每一次下潜，都是新的开始。</p></div>
+        <div class="home-sheet paper">
+          <div class="isaac-drawing" aria-hidden="true">
+            <svg viewBox="0 0 280 290" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path class="pencil-light" d="M40 247c44-21 147-21 193 0M45 258c49-12 130-13 182 0M39 263l35 10m144-8-34 9"/>
+              <path class="pencil" d="M104 183c-5 15-5 29-3 43l-17 14c-10 8-3 13 11 13 18 0 25-9 30-18m38-51c8 17 10 29 6 42l18 15c12 10 1 14-11 12-13-2-23-10-29-19m-26-1c8 4 18 4 28 0M105 186c-19 10-34 19-36 29-2 8 5 11 14 4l21-14m59-20c21 7 36 20 36 30-1 9-8 9-16 1l-17-12"/>
+              <path class="pencil" d="M140 51c-41-2-77 18-79 61-2 40 25 74 77 77 49 3 81-28 81-70 0-39-27-67-79-68Z"/>
+              <path class="pencil-light" d="M72 81c-16 31-11 57 0 73m119-83c18 16 23 28 23 47M111 54l-6-8m30 5-1-10"/>
+              <ellipse cx="102" cy="120" rx="17" ry="25" fill="currentColor" transform="rotate(-8 102 120)"/>
+              <ellipse cx="173" cy="119" rx="17" ry="25" fill="currentColor" transform="rotate(9 173 119)"/>
+              <path d="M91 143c-5 14-8 30-4 36 3 6 13 7 17 0 4-6-1-23-2-35m64 0c-2 12-5 27-1 33 4 7 13 5 15-2 2-8-4-23-5-32" fill="#779498" fill-opacity=".7"/>
+              <path class="pencil" d="M124 162c8-7 16-7 24 0"/>
+              <path class="pencil-light" d="m47 32 8 9m-21 5 12 2m173-14-6 10m22 1-11 4M56 222l-9 5m180-11 9 5"/>
+              <path class="pencil" d="m117 18 12 3 6-11 4 12 13-2-8 10 5 10-12-4-9 9 1-14-12-4"/>
+            </svg>
+            <span class="drawing-note">Dear diary...</span>
+          </div>
+          <nav class="main-menu" aria-label="开始菜单">
+            <button id="start" class="menu-choice primary"><span class="menu-arrow" aria-hidden="true">➜</span><span>开始游戏<small>START GAME</small></span></button>
+            <button id="reload" class="menu-choice primary" hidden><span class="menu-arrow" aria-hidden="true">↻</span><span>重新加载<small>RETRY</small></span></button>
+            <button id="resume" class="menu-choice primary" hidden><span class="menu-arrow" aria-hidden="true">➜</span><span>返回游戏<small>RESUME</small></span></button>
+            <button class="menu-choice" data-nav="mods"><span>模组管理<small>MODS</small></span><span class="choice-mark" aria-hidden="true">＋</span></button>
+            <button class="menu-choice" data-nav="saves"><span>我的存档<small>SAVE FILES</small></span><span class="choice-mark" aria-hidden="true">↗</span></button>
+            <button class="menu-choice" data-nav="settings"><span>游戏设置<small>SETTINGS</small></span><span class="choice-mark" aria-hidden="true">⚙</span></button>
+          </nav>
+          <span class="paper-number" aria-hidden="true">I</span>
+        </div>
+        <p class="home-footnote">键盘 · 触控<span>在游戏设置中开启虚拟摇杆</span></p>
+      </section>
+
+      <section class="menu-page inner-page" data-page="mods" hidden aria-labelledby="mods-title">
+        <button class="back-button" data-nav="home">← 返回开始界面</button>
+        <div class="page-heading"><div><p class="eyebrow">MAKE IT YOUR OWN</p><h2 id="mods-title">模组管理</h2></div><span class="chapter-mark" aria-hidden="true">II</span></div>
+        <div class="paper content-sheet">
+          <div class="section-intro"><h3>带上你喜欢的 Mod</h3><p>导入自己的 Mod，在启动游戏前选择启用哪些内容。</p></div>
+          <div class="import-actions">
+            <label class="file-button primary-button" for="import-mod-zip">＋ 导入 ZIP<input id="import-mod-zip" type="file" accept=".zip,application/zip,application/x-zip-compressed"></label>
+            <label class="file-button secondary-button" for="import-mod-folder">选择 Mod 文件夹<input id="import-mod-folder" type="file" webkitdirectory directory multiple></label>
+          </div>
+          <p id="mod-storage-note" class="helper-text">一个压缩包或文件夹对应一个 Mod。导入后保存在当前浏览器中。</p>
+          <p id="mod-count" class="mod-count" aria-live="polite"></p>
+          <div id="mod-status" class="inline-status" role="status" aria-live="polite"></div>
+          <div id="mod-list" class="mod-list"><div class="empty-state"><span class="empty-symbol" aria-hidden="true">＋</span><h3>还没有导入 Mod</h3><p>从一个喜欢的 Mod 开始。你可以随时启用、停用或移除它。</p></div></div>
+          <p id="mod-transfer-note" class="sheet-note">Mod 文件独立于存档。换设备时，请同时准备 Mod 文件和存档备份。</p>
+        </div>
+      </section>
+
+      <section class="menu-page inner-page" data-page="saves" hidden aria-labelledby="saves-title">
+        <button class="back-button" data-nav="home">← 返回开始界面</button>
+        <div class="page-heading"><div><p class="eyebrow">PICK UP WHERE YOU LEFT OFF</p><h2 id="saves-title">我的存档</h2></div><span class="chapter-mark" aria-hidden="true">III</span></div>
+        <div class="paper content-sheet" id="save-transfer">
+          <div class="section-intro"><h3>和 Steam 共用你的存档</h3><p id="save-storage-note">直接导入、导出原版忏悔的 .dat 文件。游戏进度也会自动保存在当前浏览器。</p></div>
+          <div class="save-actions">
+            <div class="save-action"><span class="action-number">01</span><div><h3>导入 Steam / PC 存档</h3><p>在开始游戏之前选择 .dat，可同时选择多个文件。persistentgamedata 是解锁与成就进度，gamestate 是当前局；支持带或不带 rep_ 前缀，数字 1–3 对应原存档槽位。</p><label class="file-button primary-button" for="import-save">选择 .dat 存档<input id="import-save" type="file" multiple accept=".dat,.ini,.json,application/json"></label></div></div>
+            <div id="import-review" class="import-review" hidden><p id="import-summary"></p><label class="check-row"><input id="import-confirm" type="checkbox"><span id="import-confirm-label">确认覆盖所选槽位的同名存档。其他文件保留。</span></label><button id="cancel-import" class="text-button">取消导入</button><button class="secondary-button" data-nav="home">返回并开始游戏 →</button></div>
+            <div class="save-action"><span class="action-number">02</span><div><h3>导出原版 .dat</h3><p>先在游戏内暂停并退出当前局，再打开这里导出。迁移续局时，请带上同一槽位的进度和当前局两个文件。</p>
+              <div class="save-selectors"><label for="save-slot">存档槽位<select id="save-slot"><option value="1">存档 1</option><option value="2">存档 2</option><option value="3">存档 3</option></select></label><label for="save-kind">存档内容<select id="save-kind"><option value="persistentgamedata">解锁与成就进度</option><option value="gamestate">当前局（继续游戏）</option></select></label></div>
+              <label class="check-row save-naming"><input id="save-steam-name" type="checkbox" checked><span>使用 Steam 云存档文件名（rep_ 前缀）</span></label>
+              <p id="export-save-info" class="helper-text" aria-live="polite">启动游戏后可导出当前浏览器中的存档。</p><button id="export-save" class="secondary-button" disabled>导出 .dat 存档</button>
+            </div></div>
+          </div>
+          <p id="save-location" class="helper-text"></p>
+          <p id="save-note" class="sheet-note">适用于普通忏悔；忏悔+存档不在兼容范围内。导回 PC 时，关闭游戏并保留旧文件备份，将 .dat 放回对应存档目录，沿用原文件名。续局需使用相同 Mod；Mod 配置独立保存。</p>
+          <details class="save-advanced"><summary>完整备份与旧版兼容</summary><p>上方也可导入 options.ini 和本项目旧版 JSON 备份。完整备份包含原生存档、Mod 配置和 Mod 选择，适合在本项目的浏览器之间迁移；不能直接放入 Steam。</p><button id="export-backup" class="text-button" disabled>导出完整 JSON 备份</button></details>
+        </div>
+      </section>
+
+      <section class="menu-page inner-page" data-page="settings" hidden aria-labelledby="settings-title">
+        <button class="back-button" data-nav="home">← 返回开始界面</button>
+        <div class="page-heading"><div><p class="eyebrow">BEFORE YOU GO BELOW</p><h2 id="settings-title">游戏设置</h2></div><span class="chapter-mark" aria-hidden="true">IV</span></div>
+        <div class="paper content-sheet">
+          <label class="setting-row" for="touch-enabled"><span><strong>虚拟摇杆</strong><small>左侧移动，右侧射击。适合手机和平板游玩。</small></span><input class="switch-input" id="touch-enabled" type="checkbox"><span class="switch-track" aria-hidden="true"></span></label>
+          <div class="touch-layout-setting"><div><strong>自定义虚拟按键</strong><p>分别调整摇杆与按键的位置、大小和透明度。横屏、竖屏独立保存。</p></div><button id="edit-touch-layout" class="secondary-button">调整按键布局</button></div>
+          <label class="setting-row" for="start-fullscreen"><span><strong>启动时进入全屏</strong><small>使用整个屏幕显示游戏。按 Esc 可退出浏览器全屏。</small></span><input class="switch-input" id="start-fullscreen" type="checkbox"><span class="switch-track" aria-hidden="true"></span></label>
+          <label class="setting-row" for="console-enabled"><span><strong>启用控制台</strong><small>开始游戏前设置。启用后可使用原生调试控制台，并显示控制台虚拟按键。</small></span><input class="switch-input" id="console-enabled" type="checkbox"><span class="switch-track" aria-hidden="true"></span></label>
+          <label class="setting-row" for="fps-enabled"><span><strong>显示 FPS</strong><small>在左上角查看游戏帧率，可在游玩时调整。</small></span><input class="switch-input" id="fps-enabled" type="checkbox" checked><span class="switch-track" aria-hidden="true"></span></label>
+          <div id="fps-settings" class="fps-settings">
+            <label for="fps-mode"><span>显示内容</span><select id="fps-mode"><option value="simple">简洁 · 当前 FPS</option><option value="detailed">详细 · 帧率与 Low 帧</option></select></label>
+            <label class="fps-opacity-setting" for="fps-opacity"><span>不透明度<output id="fps-opacity-value" for="fps-opacity">85%</output></span><input id="fps-opacity" type="range" min="20" max="100" step="5" value="85"><small>数值越低，显示越透明。</small></label>
+            <p class="fps-settings-note">详细模式显示平均 FPS、1% Low、0.1% Low 和帧时间。游玩期间采样，暂停与加载时暂停统计。</p>
+          </div>
+          <div class="controls-guide"><h3>键盘操作</h3><div class="key-guide"><span><kbd>W A S D</kbd> 移动</span><span><kbd>↑ ↓ ← →</kbd> 射击</span><span><kbd>Enter</kbd> 确认</span><span><kbd>Esc</kbd> 暂停 / 返回</span><span><kbd>Space</kbd> 主动道具</span><span><kbd>E</kbd> 炸弹</span><span><kbd>Q</kbd> 卡牌 / 胶囊</span><span><kbd>Ctrl</kbd> 长按丢弃</span><span><kbd>Tab</kbd> 地图</span><span><kbd>`</kbd> 控制台（启用后）</span></div></div>
+          <p id="compatibility" role="status">正在检查浏览器支持情况…</p>
+          <details class="diagnostics"><summary>运行日志</summary><pre id="log"></pre></details>
+          <div class="session-actions"><button id="stop" class="text-button danger" disabled>结束游戏</button><span>要保留当前局，请先在游戏暂停菜单中保存退出。结束后自动返回开始界面。</span></div>
+        </div>
+      </section>
+    </div>
+    <footer class="launcher-footer"><span>THE BINDING OF ISAAC: REPENTANCE</span><span>你的冒险，由你继续。</span></footer>
+    <noscript><p class="noscript">此游戏需要 JavaScript，请启用后重新打开页面。</p></noscript>
+  </main>
+
+  <section id="game-view" aria-label="游戏" hidden>
+    <canvas id="game-canvas" width="960" height="540" tabindex="0" aria-label="游戏画面"></canvas>
+    <div id="game-tools" class="game-tools"><button id="open-menu" title="打开启动菜单">☰ <span>菜单</span></button><button id="fullscreen" aria-label="切换全屏">⛶</button></div>
+    <aside id="fps-panel" class="fps-panel" data-mode="simple" aria-label="游戏帧率" aria-live="off" hidden>
+      <div class="fps-primary"><span id="fps-current">--</span><span class="fps-unit">FPS</span></div>
+      <dl id="fps-details" class="fps-details" hidden>
+        <div><dt>平均</dt><dd id="fps-average">--</dd></div>
+        <div><dt>1% Low</dt><dd id="fps-low-1">--</dd></div>
+        <div><dt>0.1% Low</dt><dd id="fps-low-01">--</dd></div>
+        <div><dt>帧时间</dt><dd><span id="fps-frametime">--</span><span class="fps-ms"> ms</span></dd></div>
+      </dl>
+      <p id="fps-sample-note" class="fps-sample-note">正在采样</p>
+    </aside>
+    <div id="touch" class="touch-controls" hidden aria-label="虚拟控制器">
+      <div class="touch-stick movement-stick" data-stick="move" aria-label="移动摇杆"><span class="stick-cross" aria-hidden="true"></span><span class="stick-thumb" aria-hidden="true"></span></div>
+      <div class="touch-stick shooting-stick" data-stick="shoot" aria-label="射击摇杆"><span class="stick-cross" aria-hidden="true"></span><span class="stick-thumb" aria-hidden="true"></span></div>
+      <div class="touch-actions"><button data-key="341" aria-label="长按 Ctrl 丢弃饰品或卡牌">丢弃<small>CTRL</small></button><button data-key="69" aria-label="放置炸弹">炸弹<small>E</small></button><button data-key="32" aria-label="使用主动道具">道具<small>SPACE</small></button><button data-key="81" aria-label="使用卡牌或胶囊">卡牌<small>Q</small></button></div>
+      <div class="touch-menu-actions"><button data-key="258" aria-label="显示地图">地图</button><button data-key="256" aria-label="暂停或返回">返回</button><button data-key="257" aria-label="确认">确认</button><button data-key="96" data-console-control aria-label="打开或关闭控制台" hidden disabled>控制台<small>`</small></button></div>
+    </div>
+    <section id="console-input-panel" class="console-input-panel" aria-label="控制台命令输入" hidden>
+      <form id="console-command-form" class="console-command-form">
+        <input id="console-command" type="text" aria-label="控制台命令" aria-describedby="console-command-status" placeholder="输入控制台命令" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
+        <button id="console-submit" type="submit">执行</button><button id="console-close" type="button">关闭</button>
+      </form>
+      <p id="console-command-status" class="console-command-status" role="status" aria-live="polite">使用英文命令，可输入数字和符号。</p>
+    </section>
+  </section>
+  <section id="touch-layout-editor" class="touch-layout-editor" role="dialog" aria-modal="true" aria-labelledby="touch-layout-title" hidden>
+    <div class="layout-preview-backdrop" aria-hidden="true"><span>YOUR CONTROLS</span><strong>你的操作习惯</strong><p>拖动按键，把它放到顺手的位置。</p></div>
+    <header class="layout-toolbar"><div><h2 id="touch-layout-title">按键布局</h2><span id="touch-layout-orientation">横屏布局</span></div><div class="layout-toolbar-actions"><button id="touch-layout-panel-toggle" class="layout-quiet" aria-expanded="true" aria-controls="touch-layout-panel">收起面板</button><button id="touch-layout-cancel" class="layout-quiet">取消</button><button id="touch-layout-save" class="layout-save">保存布局</button></div></header>
+    <div id="touch-layout-stage" class="touch-layout-stage"></div>
+    <div id="touch-layout-panel" class="touch-layout-panel">
+      <label class="layout-control-picker" for="touch-layout-control"><span>调整哪个按键</span><select id="touch-layout-control"><option value="move">移动摇杆</option><option value="shoot">射击摇杆</option><option value="key-69">炸弹</option><option value="key-32">主动道具</option><option value="key-81">卡牌 / 胶囊</option><option value="key-341">丢弃（Ctrl）</option><option value="key-258">地图</option><option value="key-256">返回 / 暂停</option><option value="key-257">确认</option><option value="key-96" hidden disabled>控制台</option></select></label>
+      <div class="layout-sliders"><label for="touch-layout-size"><span>大小<output id="touch-layout-size-value">100%</output></span><input id="touch-layout-size" type="range" min="60" max="180" step="5" value="100"></label><label for="touch-layout-opacity"><span>不透明度<output id="touch-layout-opacity-value">70%</output></span><input id="touch-layout-opacity" type="range" min="20" max="100" step="5" value="70"></label><label for="touch-layout-x"><span>水平位置<output id="touch-layout-x-value">0%</output></span><input id="touch-layout-x" type="range" min="0" max="100" step="1" value="0"></label><label for="touch-layout-y"><span>垂直位置<output id="touch-layout-y-value">0%</output></span><input id="touch-layout-y" type="range" min="0" max="100" step="1" value="0"></label></div>
+      <div class="layout-panel-footer"><button id="touch-layout-reset" class="layout-quiet">恢复当前方向默认</button><span>选中后也可用方向键微调</span></div><p id="touch-layout-status" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+  <div id="status-dock" class="status-dock" aria-live="polite"><span class="loading-mark" aria-hidden="true">†</span><div id="status" role="status">准备好就出发吧。</div><progress id="progress" value="0" max="1" aria-label="游戏加载进度"></progress></div>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

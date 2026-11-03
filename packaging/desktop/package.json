@@ -1,0 +1,20 @@
+{
+  "name": "isaac-repentance-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline desktop shell for the Isaac Repentance J835 WebAssembly runtime",
+  "productName": "Isaac Repentance",
+  "main": "main.mjs",
+  "type": "module",
+  "scripts": {
+    "setup": "node node_modules/electron/install.js",
+    "start": "electron .",
+    "test": "node --test test/*.test.mjs",
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "electron": "45.2.1",
+    "electron-builder": "26.18.0",
+    "playwright-core": "1.64.1"
+  }
+}

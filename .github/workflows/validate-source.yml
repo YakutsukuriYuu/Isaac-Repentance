@@ -1,0 +1,39 @@
+name: Validate source
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '24'
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: '1.27.3'
+          cache: false
+      - name: Check private input handling
+        run: python3 -m unittest discover -s packaging/tests -v
+      - name: Check native launcher
+        working-directory: portable/launcher
+        run: go test ./...
+      - name: Check web file formats and FPS metrics
+        run: |
+          node Isaac-Repentance/project/web/test_save_helpers.mjs
+          node Isaac-Repentance/project/web/test_mod_helpers.mjs
+          node Isaac-Repentance/project/web/test_disk_storage.mjs
+          node Isaac-Repentance/project/web/test_fps_metrics.mjs
+      - name: Check mobile storage bridge
+        run: node --test packaging/mobile/tests/*.test.mjs
+      - name: Check desktop lifecycle
+        run: node --test packaging/desktop/test/*.test.mjs
+      - name: Validate uploadable source inventory
+        run: python3 packaging/scripts/export_source.py --list
