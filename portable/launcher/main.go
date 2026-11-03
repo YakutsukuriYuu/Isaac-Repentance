@@ -317,6 +317,10 @@ func contentType(name string) string {
 		return "application/wasm"
 	case ".json":
 		return "application/json; charset=utf-8"
+	case ".a":
+		// Isaac resource archives are opaque game data, not Unix ar libraries.
+		// Do not let the host's MIME database change their served type.
+		return "application/octet-stream"
 	}
 	if result := mime.TypeByExtension(path.Ext(name)); result != "" {
 		return result

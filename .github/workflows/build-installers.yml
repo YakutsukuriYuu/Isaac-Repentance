@@ -38,7 +38,7 @@ jobs:
           distribution: temurin
           java-version: '21'
       - name: Install pinned Android SDK components
-        run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0' 'build-tools;36.0.0'
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;35.0.0" "build-tools;36.0.0"'
       - name: Fetch and verify private runtime
         env:
           ISAAC_RUNTIME_URL: ${{ secrets.ISAAC_RUNTIME_URL }}

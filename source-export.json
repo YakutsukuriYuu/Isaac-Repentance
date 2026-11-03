@@ -3,8 +3,8 @@
   "files": [
     {
       "path": ".github/workflows/build-installers.yml",
-      "bytes": 8793,
-      "sha256": "9baefdeec67913fc97c44ce50556f5a58c68d016e72a891e2234aa196f18adce"
+      "bytes": 8836,
+      "sha256": "92a13f5a3cab570fc33f3e38c0cd3dc5802b8c5476e5f0d8cc6e0bf1998b8880"
     },
     {
       "path": ".github/workflows/validate-source.yml",
@@ -328,13 +328,13 @@
     },
     {
       "path": "portable/launcher/main.go",
-      "bytes": 20027,
-      "sha256": "c9b1399f4448f5df2fdc28307fa5bed0091c171cc32f56297aea2367e17b1271"
+      "bytes": 20216,
+      "sha256": "156910c2d41ce06ac836afd367da01facd0bee799313ce916c8aba5ba9f2e433"
     },
     {
       "path": "portable/launcher/main_test.go",
-      "bytes": 14538,
-      "sha256": "a7c4fa99a0cc13338db4c423c31fa2e53aeb046dc6fc837efc8cfba013af6d66"
+      "bytes": 15014,
+      "sha256": "ff115a68f74885d20a1adb6ad41eab2794103d4ae0da9a60075e1332e5c3f619"
     },
     {
       "path": "portable/launcher/ready.go",

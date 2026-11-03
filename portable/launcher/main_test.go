@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"io"
+	"mime"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -119,6 +120,17 @@ func TestRelocatedPackageAndHTTPAssets(t *testing.T) {
 	b.ServeHTTP(w, r)
 	if w.Code != 403 {
 		t.Errorf("non-loopback Host accepted: %d", w.Code)
+	}
+}
+
+func TestGameArchiveMIMEIgnoresHostDatabase(t *testing.T) {
+	// Linux commonly maps .a to Unix archive files; macOS may not. These game
+	// archives must have the same binary response type on both hosts.
+	if err := mime.AddExtensionType(".a", "application/x-archive"); err != nil {
+		t.Fatal(err)
+	}
+	if got := contentType("resources/packed/repentance.a"); got != "application/octet-stream" {
+		t.Fatalf("host MIME database changed game resource type: %s", got)
 	}
 }
 
