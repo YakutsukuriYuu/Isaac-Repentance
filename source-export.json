@@ -138,18 +138,18 @@
     },
     {
       "path": "packaging/RELEASE_NOTES.md",
-      "bytes": 2712,
-      "sha256": "03de4b486c9eef9c92114abd5923799793e1310477bbc64eb8224312832c5510"
+      "bytes": 3991,
+      "sha256": "08156c22123af65f413927b8d3a5b899e4c71a1e20c2041ad1fc8138bb1f5887"
     },
     {
       "path": "packaging/SOURCE_README.md",
       "bytes": 7680,
-      "sha256": "7c75c9e20c0df75ec144a837681454cf544bbb10cf27ec653d79a7a8f12c6538"
+      "sha256": "4fa0c2e75e13646fda19b0bacfacf95b93135d5a1a0684943dae312b496d8bc2"
     },
     {
       "path": "packaging/VALIDATION.md",
-      "bytes": 4968,
-      "sha256": "1e1d6d2c69bff97ea1abebaf2260ce0169adc1456ce3d13d96947f6b15b74034"
+      "bytes": 5338,
+      "sha256": "6920751dad9a65603380177e635f589223a99b011d9d08d13c03becf3c951777"
     },
     {
       "path": "packaging/desktop/README.md",
@@ -179,12 +179,12 @@
     {
       "path": "packaging/desktop/package-lock.json",
       "bytes": 127582,
-      "sha256": "197667da6522755747e8c1c07f1ece18b1fe24fa216cb0d6df7981a712be79c0"
+      "sha256": "316193e3f93b07c9bb23e39137d9e6a10289cf32f3273225963d89ce2a258a15"
     },
     {
       "path": "packaging/desktop/package.json",
       "bytes": 548,
-      "sha256": "8204e9bd8f56b2560b1c30792af66474f790e20af7cecd67771d5c53493b7d1b"
+      "sha256": "4b491708d04c570fc092a3026c7a885900f899289f1e7201e08c087d5aea353c"
     },
     {
       "path": "packaging/desktop/runtime-server.mjs",
@@ -219,12 +219,12 @@
     {
       "path": "packaging/mobile/package-lock.json",
       "bytes": 58634,
-      "sha256": "e15a40dc8ff9d18755318fe270d09bd1e0eabf8be7aa4a9f421b04b6b4a1cda2"
+      "sha256": "1eaade023c8ed3776b0d7688e4ab4dd140c3845c0cf3259519da65b17dcdd980"
     },
     {
       "path": "packaging/mobile/package.json",
       "bytes": 662,
-      "sha256": "0ef3c505118b7c8a8f68b260e29e5ef572649503f1bc507c8af638492170b570"
+      "sha256": "e7031a2958ef1cde0d16f1b0281574a1311cadf8c9f834aaf5f4901fa136c525"
     },
     {
       "path": "packaging/mobile/scripts/build-android.mjs",
@@ -259,7 +259,7 @@
     {
       "path": "packaging/runtime.lock.json",
       "bytes": 766,
-      "sha256": "f934f65be866846a6a1ea7745a3426b465d14d969fcad9369dd61006609ef9df"
+      "sha256": "4701360b16825b602af7e1bf31936fb33a1beb877cd5087d2037f8d1eee552db"
     },
     {
       "path": "packaging/scripts/export_source.py",

@@ -4,6 +4,12 @@ This file distinguishes source preparation, package compilation, and real gamepl
 The current game target is Repentance 1.7.9b.J835. No mobile performance claim is
 implied by generating a native project or an installer.
 
+Version 0.1.3 caches synchronous WebGL query answers in the Wasm core. On Mac
+Chrome the per-frame busy time fell from 10.2 ms to 2.4 ms and synchronous
+queries fell from about 47% of main-thread CPU (4x throttle) to 0.2%. A
+strict per-call GL error run completed without errors, and the rendered room
+was visually checked. No physical-device benchmark was run.
+
 Version 0.1.2 enables the existing exact-key guest lookup cache and indexed GL
 token dispatch, and avoids resubmitting unchanged alpha-test uniforms. It was
 prepared by static code review and compilation, without a device benchmark.
@@ -18,7 +24,7 @@ streaming, save scheduling, touch rendering and Android display preferences.
 It was prepared through code review, syntax checks and compilation. No new
 physical-device gameplay or performance benchmark was run for this update.
 The gameplay measurements below describe the earlier 0.1.0 core and must not be
-treated as performance acceptance for 0.1.1 or 0.1.2.
+treated as performance acceptance for 0.1.1, 0.1.2 or 0.1.3.
 
 ## Automated checks
 

@@ -1,3 +1,27 @@
+## 0.1.3 — Remove per-frame GPU waits from WebGL queries
+
+- The game asks for renderbuffer parameters and framebuffer completeness every
+  frame. In Chrome and Android WebView each answer waits for the GPU process to
+  finish all queued work, so the CPU and GPU could not overlap. The Wasm core
+  now replays answers the browser already returned for the same objects.
+- Framebuffer completeness is replayed only for an identical attachment set
+  whose images are unchanged. Texture uploads, renderbuffer storage, attachment
+  changes and deletions force a real query. Only COMPLETE results are replayed.
+- Strict GL diagnostics (`?glchecks=strict`) disable the cache.
+
+Mac Chrome measurements (real starting room, movement and shooting):
+
+| Measurement | 0.1.2 | 0.1.3 |
+| --- | ---: | ---: |
+| Synchronous query share of main-thread CPU (4x CPU throttle) | 47% | 0.2% |
+| Busy time per frame, unthrottled | 10.2 ms | 2.4 ms |
+| Queries answered by the browser per 900 frames | all (~22,000) | 32 |
+
+Throttled FPS varied between runs by more than the difference between builds,
+so no FPS gain is claimed from them. These are desktop measurements, not phone
+measurements; no Android or iOS device benchmark was run. Game speed, frame
+pacing, saves and resources are unchanged.
+
 ## 0.1.2 — Reduce guest dispatch overhead
 
 - Enable the existing translated-function lookup cache and dense import-slot

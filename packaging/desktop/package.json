@@ -1,6 +1,6 @@
 {
   "name": "isaac-repentance-desktop",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "description": "Offline desktop shell for the Isaac Repentance J835 WebAssembly runtime",
   "productName": "Isaac Repentance",
