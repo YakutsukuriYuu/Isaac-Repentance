@@ -1,9 +1,11 @@
 {
   "name": "isaac-repentance-mobile",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
-  "engines": {"node": ">=22"},
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "prepare:native": "node scripts/prepare.mjs",
     "build:android": "node scripts/build-android.mjs",
@@ -18,5 +20,8 @@
     "@capacitor/ios": "8.6.0",
     "@capacitor/share": "8.0.3"
   },
-  "devDependencies": {"@capacitor/cli": "8.6.0", "esbuild": "0.28.2"}
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0",
+    "esbuild": "0.28.2"
+  }
 }

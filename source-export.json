@@ -63,8 +63,8 @@
     },
     {
       "path": "Isaac-Repentance/project/web/app.mjs",
-      "bytes": 38315,
-      "sha256": "8ab434cc874f66b2f45cf30aff73254201b89700f7a07e3e061efa60b1eea471"
+      "bytes": 39559,
+      "sha256": "7032e5f15c2335ba0e68afa5c1b6f5011901c4edc486de85d548dab4e958feef"
     },
     {
       "path": "Isaac-Repentance/project/web/disk_storage.mjs",
@@ -73,8 +73,8 @@
     },
     {
       "path": "Isaac-Repentance/project/web/fps_metrics.mjs",
-      "bytes": 2862,
-      "sha256": "735c5acdb4601a14b47aae6c35da817541b28c80f889f6325c6534fac171c5d7"
+      "bytes": 2994,
+      "sha256": "8b93ec6eb302669f937d8bd06f1351c3e9eb4feacbfd478d948e52091cb48a1d"
     },
     {
       "path": "Isaac-Repentance/project/web/index.html",
@@ -88,13 +88,13 @@
     },
     {
       "path": "Isaac-Repentance/project/web/save_helpers.mjs",
-      "bytes": 11745,
-      "sha256": "d9012758d0c606dbeacc47051ac3704ac32d920d0bc100ad82a7e33f06ffdf31"
+      "bytes": 15167,
+      "sha256": "157a713a1178ed6fdde19043ef121e8e5b2b17c09b72de7e7890aa18694758c4"
     },
     {
       "path": "Isaac-Repentance/project/web/styles.css",
-      "bytes": 32703,
-      "sha256": "599705f2bc7881548f808a3680d006b7864af87b2c278bf6e7f076102035388f"
+      "bytes": 32627,
+      "sha256": "5f34d47b80711da37b9e103efa56b5ff6c5a281eb5c4b289be6328a38c41af3f"
     },
     {
       "path": "Isaac-Repentance/project/web/test_disk_storage.mjs",
@@ -123,8 +123,8 @@
     },
     {
       "path": "Isaac-Repentance/project/web/touch_controls.mjs",
-      "bytes": 4467,
-      "sha256": "f49f8f690a7911eb9ac9fa54a4f1edcb47941066b0f3c4a3add5554e141208b9"
+      "bytes": 6649,
+      "sha256": "ade5aca7725a750531da61566684e3de7a33c5545e61e858b578f303c036f541"
     },
     {
       "path": "Isaac-Repentance/project/web/touch_layout.mjs",
@@ -137,14 +137,19 @@
       "sha256": "9b1ade26e759c0ea5c2b6b8615a35db2cb7567fd94f41b1690cf0544eff38a7a"
     },
     {
+      "path": "packaging/RELEASE_NOTES.md",
+      "bytes": 1555,
+      "sha256": "26c05f8fdfaff5fd36af531d19748ffc59a1f7186074db43d9c60be842348ae2"
+    },
+    {
       "path": "packaging/SOURCE_README.md",
-      "bytes": 7551,
-      "sha256": "c3f2c09deaa903437841a0c34b4ea2e5e35646daca49cbc2bd0b95215a1f4efa"
+      "bytes": 7680,
+      "sha256": "ab2d7953790942897c908a5e713a044b53fb7e47c26a98907c6946b5dcaccd15"
     },
     {
       "path": "packaging/VALIDATION.md",
-      "bytes": 3918,
-      "sha256": "b94e0ad8949b360f3eadd658e249165981496acd0604f86d5ade104532cdf761"
+      "bytes": 4351,
+      "sha256": "89b0e7565fd2bd100d7a27c4251aeeca77ba85dc2b8c257a7445e24bfb0278ef"
     },
     {
       "path": "packaging/desktop/README.md",
@@ -174,12 +179,12 @@
     {
       "path": "packaging/desktop/package-lock.json",
       "bytes": 127582,
-      "sha256": "4b8110fc78a3797c690cb55bfefeb8e416cc5a33178fd472eac25a38aa1f28bf"
+      "sha256": "cb9ae1d3d40082609ab8f02dc682dd72b2140242e592e8357f8c5f1029370b27"
     },
     {
       "path": "packaging/desktop/package.json",
       "bytes": 548,
-      "sha256": "6116960e147e41328cb326d75d4f77a046dcb8e3d5d836539a9369fec4c6f233"
+      "sha256": "79d6ad1ab69358b6a42ccaa536dffc857813daf9e24ae1db259b9338518ac240"
     },
     {
       "path": "packaging/desktop/runtime-server.mjs",
@@ -214,12 +219,12 @@
     {
       "path": "packaging/mobile/package-lock.json",
       "bytes": 58634,
-      "sha256": "20fd64b4e77e29504f27efd3f13b424086ba6f07e1393cb4ca9d655afd7c6633"
+      "sha256": "db2156f0ccbad76617f6f4939c8165ea6033781b46eda834267831a24c4afcd4"
     },
     {
       "path": "packaging/mobile/package.json",
-      "bytes": 642,
-      "sha256": "45df4e99630487e919a4c99a3722d5117672a83ce5b92b831f1bdb1e25d09404"
+      "bytes": 662,
+      "sha256": "27507d1b2238b78a5d53ed64a141eb85aeb77c5cb5535ad5eeb9aeb8a26c4918"
     },
     {
       "path": "packaging/mobile/scripts/build-android.mjs",
@@ -233,8 +238,8 @@
     },
     {
       "path": "packaging/mobile/scripts/prepare.mjs",
-      "bytes": 8525,
-      "sha256": "d60cffac6336d7fca2fb727918d78743169df6a75bdda47d61605e3356754a99"
+      "bytes": 13050,
+      "sha256": "29b1c5ec9d30ec4502fcec5e0689fe4b525f4c5542c465838d6fb21b263f717d"
     },
     {
       "path": "packaging/mobile/src/bootstrap.mjs",
@@ -254,12 +259,12 @@
     {
       "path": "packaging/runtime.lock.json",
       "bytes": 766,
-      "sha256": "14e67e4ff5208e47f5890d4d18d41c35daf7c476c8c4c2250a6c618022e39fa6"
+      "sha256": "9b1551fef3d4492eb6d4ddcd3a18ae77448f6c2973ddb24de0adfd5c616d8d96"
     },
     {
       "path": "packaging/scripts/export_source.py",
-      "bytes": 5338,
-      "sha256": "6013b97dbf46e17f26f51e427b89d12109dd48cb4c48d3d45a484b1ffe6c5b83"
+      "bytes": 5358,
+      "sha256": "19de125b26318ef011b266be90564736c5828f30344c3f9d7a03518840869c7c"
     },
     {
       "path": "packaging/scripts/probe_runtime_access.py",
@@ -268,8 +273,8 @@
     },
     {
       "path": "packaging/scripts/publish_release.py",
-      "bytes": 13276,
-      "sha256": "6d8b039e46f6aeeb6572312f2726065e8e4bf82d8a6f8fabe9954d8e616d60a3"
+      "bytes": 13460,
+      "sha256": "192ed55b160cfdfa885aa7934fec9dfc406d86fd1815ea9b4e4eca9e26dd337b"
     },
     {
       "path": "packaging/scripts/runtime_inputs.py",

@@ -38,16 +38,17 @@ export function createFpsMetrics(){
     while(count>1&&duration-intervals[first]>=FPS_WINDOW_MS)removeFirst();
     return true;
   }
-  function snapshot(){
+  function snapshot({detailed=true}={}){
     let currentDurationMs=0,currentSampleCount=0;
     for(let i=count-1;i>=0&&currentDurationMs<FPS_CURRENT_WINDOW_MS;i--){
       currentDurationMs+=intervals[(first+i)%FPS_MAX_SAMPLES];
       currentSampleCount++;
     }
-    // Only sort when rendering a statistics snapshot, never on each present.
-    const slowest=Array.from({length:count},(_,i)=>intervals[(first+i)%FPS_MAX_SAMPLES]).sort((a,b)=>b-a);
+    // The default/simple overlay needs only sums; avoid allocating and sorting
+    // a minute of frame samples for low-percentile values that are not visible.
+    const slowest=detailed&&count?Array.from({length:count},(_,i)=>intervals[(first+i)%FPS_MAX_SAMPLES]).sort((a,b)=>b-a):null;
     function low(fraction,minimum){
-      if(count<minimum)return null;
+      if(!slowest||count<minimum)return null;
       const length=Math.ceil(count*fraction);
       let sum=0;for(let i=0;i<length;i++)sum+=slowest[i];
       return 1000*length/sum;

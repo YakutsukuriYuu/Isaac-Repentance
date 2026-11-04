@@ -104,6 +104,74 @@ export async function parseBackup(text){
 function maybeStat(FS,path){
   try{return FS.lstat(path);}catch(error){if(error?.code==='ENOENT'||error?.errno===44)return null;throw error;}
 }
+/** Observe successful filesystem mutations instead of repeatedly reading and
+ * encoding every save on the autosave timer. Emscripten's native file syscalls
+ * dispatch through these FS methods, including buffered stdio when it flushes.
+ * A generation is acknowledged only after its snapshot was committed. Changes
+ * made while that asynchronous commit is in flight therefore remain pending.
+ * Forced exports/background/exit flushes still read the complete native files.
+ */
+export function createSaveChangeTracker(FS){
+  let generation=0,savedGeneration=0,uncertain=false;
+  const originals=[];
+  const required=['write','truncate','doTruncate','mknod','unlink','rename','rmdir'];
+  if(required.some(name=>typeof FS[name]!=='function')||typeof FS.getPath!=='function')
+    return {get dirty(){return true;},get generation(){return 0;},acknowledge(){},dispose(){}};
+  function normalize(value){
+    try{
+      if(value&&typeof value==='object')return FS.getPath(value.node||value);
+      if(typeof value!=='string')return null;
+      const source=value.startsWith('/')?value:FS.cwd()+'/'+value,parts=[];
+      for(const part of source.split('/')){
+        if(!part||part==='.')continue;
+        if(part==='..')parts.pop();else parts.push(part);
+      }
+      return '/'+parts.join('/');
+    }catch{return null;}
+  }
+  function tracked(path,directory=false){
+    if(path===null){uncertain=true;return true;}
+    if(directory&&(path==='/'||path==='/game'))return true;
+    if(!/^\/game\/(?:user|data)(?:\/|$)/.test(path))return false;
+    if(directory)return true;
+    try{validateSavePath(path.slice('/game/'.length));return true;}catch{return false;}
+  }
+  function hook(name,paths,{directory=false,writableMap=false,wrote=false}={}){
+    const original=FS[name];if(typeof original!=='function')return;
+    const wrapped=function(...args){
+      // Capture paths before rename/unlink invalidate the old directory entry.
+      const changed=paths(args).some(path=>tracked(normalize(path),directory));
+      const result=Reflect.apply(original,this,args);
+      if(changed&&(!wrote||result>0)){
+        generation++;
+        // A writable mapping can be changed directly without calling FS.write.
+        // In that uncommon case keep full autosaves rather than trust a hook.
+        if(writableMap&&(args[3]&2))uncertain=true;
+      }
+      return result;
+    };
+    try{FS[name]=wrapped;}catch{uncertain=true;return;}
+    if(FS[name]!==wrapped){uncertain=true;return;}
+    originals.push([name,original,wrapped]);
+  }
+  hook('write',args=>[args[0]],{wrote:true});
+  // Both truncate(path) and ftruncate(fd) use doTruncate(stream,node,length).
+  hook('doTruncate',args=>[args[1]]);
+  hook('mknod',args=>[args[0]]);
+  hook('unlink',args=>[args[0]]);
+  hook('rename',args=>args.slice(0,2),{directory:true});
+  hook('rmdir',args=>[args[0]],{directory:true});
+  hook('symlink',args=>[args[1]],{directory:true});
+  hook('allocate',args=>[args[0]]);
+  hook('msync',args=>[args[0]]);
+  hook('mmap',args=>[args[0]],{writableMap:true});
+  return {
+    get dirty(){return uncertain||generation!==savedGeneration;},
+    get generation(){return generation;},
+    acknowledge(version){if(Number.isSafeInteger(version)&&version>=savedGeneration&&version<=generation)savedGeneration=version;},
+    dispose(){for(const [name,original,wrapped]of originals)if(FS[name]===wrapped)FS[name]=original;}
+  };
+}
 function assertDirectory(FS,path,create){
   const stat=maybeStat(FS,path);
   if(!stat){if(create){FS.mkdir(path);return;}throw new Error(`存档目录不存在：${path}`);}
@@ -143,7 +211,7 @@ export function collectNativeSaves(FS){
     if(stat.size===0)continue;
     if(!Number.isSafeInteger(stat.size)||stat.size<0||(bytes+=stat.size)>MAX_SAVE_BYTES)
       throw new Error('存档大小不合法或总大小超过 32 MiB。');
-    const data=new Uint8Array(FS.readFile(fullPath));
+    const data=FS.readFile(fullPath);
     if(data.length!==stat.size)throw new Error('读取存档时长度发生变化。');
     files.push({path,data,slot,kind,localName,steamName:'rep_'+localName});
   }
@@ -162,7 +230,8 @@ export function collectSaveFiles(FS,{allowEmpty=false}={}){
       const path=file.slice('/game/'.length);
       try{validateSavePath(path);}catch{continue;}
       if(files.length>=MAX_SAVE_FILES||(total+=stat.size)>MAX_SAVE_BYTES)throw new Error('存档数据超过导出上限（32 MiB / 2048 个文件）。');
-      files.push({path,data:new Uint8Array(FS.readFile(file))});
+      // FS.readFile already returns an owned byte snapshot, not a MEMFS view.
+      files.push({path,data:FS.readFile(file)});
     }
   }
   for(const root of ['/game/user','/game/data']){assertDirectory(FS,root,false);walk(root,0);}
@@ -182,7 +251,7 @@ export function applyBackup(FS,backup){
   for(const file of backup.files){
     const target=destination(FS,file.path,true);
     if(target.stat&&(oldBytes+=target.stat.size)>MAX_SAVE_BYTES)throw new Error('待覆盖的现有存档超过安全恢复上限。');
-    previous.push({path:target.path,data:target.stat?new Uint8Array(FS.readFile(target.path)):null});
+    previous.push({path:target.path,data:target.stat?FS.readFile(target.path):null});
   }
   let written=0;
   const rollback=()=>{

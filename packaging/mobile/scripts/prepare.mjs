@@ -30,13 +30,128 @@ if (platform === 'android') {
   const manifest = 'android/app/src/main/AndroidManifest.xml';
   let xml = await readFile(manifest, 'utf8');
   if (!xml.includes('android:largeHeap=')) xml = xml.replace('<application\n', '<application\n        android:largeHeap="true"\n');
+  if (!xml.includes('android:appCategory=')) xml = xml.replace('<application\n', '<application\n        android:appCategory="game"\n');
   if (!xml.includes('android:screenOrientation=')) xml = xml.replace('android:name=".MainActivity"', 'android:name=".MainActivity"\n            android:screenOrientation="sensorLandscape"');
   // Existing HTML file pickers use the platform document picker. Private app
   // data stays in Documents; shared exports use the plugin's cache provider.
   await writeFile(manifest, xml);
   const config = JSON.parse(await readFile('capacitor.config.json', 'utf8'));
   const activity = `android/app/src/main/java/${config.appId.replaceAll('.', '/')}/MainActivity.java`;
-  await writeFile(activity, `package ${config.appId};\n\nimport android.os.Bundle;\nimport androidx.core.view.WindowCompat;\nimport androidx.core.view.WindowInsetsCompat;\nimport androidx.core.view.WindowInsetsControllerCompat;\nimport com.getcapacitor.BridgeActivity;\n\npublic class MainActivity extends BridgeActivity {\n    private void hideSystemBars() {\n        WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());\n        controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);\n        controller.hide(WindowInsetsCompat.Type.systemBars());\n    }\n    @Override public void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        hideSystemBars();\n    }\n    @Override public void onWindowFocusChanged(boolean hasFocus) {\n        super.onWindowFocusChanged(hasFocus);\n        if (hasFocus) hideSystemBars();\n    }\n}\n`);
+  await writeFile(activity, `package ${config.appId};
+
+import android.content.res.Configuration;
+import android.hardware.display.DisplayManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity implements DisplayManager.DisplayListener {
+    private static final float GAME_FRAME_RATE = 60f;
+    private DisplayManager displayManager;
+    private boolean displayListenerRegistered;
+    private final Handler displayHandler = new Handler(Looper.getMainLooper());
+
+    private void hideSystemBars() {
+        WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+        controller.hide(WindowInsetsCompat.Type.systemBars());
+    }
+
+    private Display currentDisplay() {
+        Display display = getWindow().getDecorView().getDisplay();
+        return display != null ? display : getWindowManager().getDefaultDisplay();
+    }
+
+    private void preferGameFrameRate() {
+        if (isFinishing() || isDestroyed()) return;
+        // This is a window preference, never a system refresh-rate override.
+        // Thermal limits, battery saver and user settings remain authoritative.
+        try {
+            Display display = currentDisplay();
+            if (display == null || !display.isValid()) return;
+            int modeId = 0;
+            float refreshRate = 0f;
+            if (Build.VERSION.SDK_INT >= 34) {
+                // Android 14+ interprets this as a seamless content-rate hint;
+                // the OS can use VRR or 60/120 Hz without changing resolution.
+                refreshRate = GAME_FRAME_RATE;
+            } else {
+                // Older Android requires an advertised mode. Only consider the
+                // current physical resolution, preferring 60, then 120/180 Hz.
+                // Panels without an even multiple retain the system's choice.
+                Display.Mode current = display.getMode();
+                Display.Mode preferred = null;
+                for (Display.Mode candidate : display.getSupportedModes()) {
+                    if (candidate.getPhysicalWidth() != current.getPhysicalWidth()
+                            || candidate.getPhysicalHeight() != current.getPhysicalHeight()) continue;
+                    float rate = candidate.getRefreshRate();
+                    int multiple = Math.round(rate / GAME_FRAME_RATE);
+                    if (multiple < 1 || Math.abs(rate - multiple * GAME_FRAME_RATE) > 1f) continue;
+                    if (preferred == null || rate < preferred.getRefreshRate()) preferred = candidate;
+                }
+                if (preferred != null) {
+                    modeId = preferred.getModeId();
+                    refreshRate = preferred.getRefreshRate();
+                }
+            }
+            WindowManager.LayoutParams params = getWindow().getAttributes();
+            if (params.preferredDisplayModeId != modeId || Math.abs(params.preferredRefreshRate - refreshRate) > 0.01f) {
+                params.preferredDisplayModeId = modeId;
+                params.preferredRefreshRate = refreshRate;
+                getWindow().setAttributes(params);
+            }
+        } catch (RuntimeException error) {
+            // Some OEM display services reject hints during display migration.
+            // Rendering must remain usable under the system's default policy.
+            Log.w("IsaacDisplay", "Display frame-rate preference unavailable", error);
+        }
+    }
+
+    @Override public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        displayManager = (DisplayManager) getSystemService(DISPLAY_SERVICE);
+        hideSystemBars();
+        preferGameFrameRate();
+    }
+    @Override public void onResume() {
+        super.onResume();
+        if (displayManager != null && !displayListenerRegistered) {
+            displayManager.registerDisplayListener(this, displayHandler);
+            displayListenerRegistered = true;
+        }
+        preferGameFrameRate();
+    }
+    @Override public void onPause() {
+        if (displayManager != null && displayListenerRegistered) {
+            displayManager.unregisterDisplayListener(this);
+            displayListenerRegistered = false;
+        }
+        super.onPause();
+    }
+    @Override public void onConfigurationChanged(Configuration configuration) {
+        super.onConfigurationChanged(configuration);
+        preferGameFrameRate();
+    }
+    @Override public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemBars();
+            preferGameFrameRate();
+        }
+    }
+    @Override public void onDisplayAdded(int displayId) { preferGameFrameRate(); }
+    @Override public void onDisplayRemoved(int displayId) { preferGameFrameRate(); }
+    @Override public void onDisplayChanged(int displayId) { preferGameFrameRate(); }
+}
+`);
   const gradle = 'android/app/build.gradle';
   let text = await readFile(gradle, 'utf8');
   text = text.replace(/versionCode \d+/, `versionCode ${buildNumber}`).replace(/versionName "[^"]+"/, `versionName "${packageVersion}"`);

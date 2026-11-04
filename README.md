@@ -40,6 +40,8 @@ from this source export.
 Download complete installers from
 [the latest Release](https://github.com/YakutsukuriYuu/Isaac-Repentance/releases/latest).
 Release downloads do not require a GitHub login and do not expire after seven days.
+See the [current release notes](packaging/RELEASE_NOTES.md) for the 0.1.1 mobile
+performance changes and their validation scope.
 
 See [GitHub setup](packaging/GITHUB_SETUP.md) for resource storage,
 credentials, signing, and the first Actions run.

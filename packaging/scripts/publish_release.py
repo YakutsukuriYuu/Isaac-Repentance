@@ -106,7 +106,11 @@ def prepare_metadata(selected, details, directory):
            'Unsigned device IPA; re-sign it with your sideloading tool before installation.')
     mac = ('Developer ID signed and notarized.' if signed else
            'Ad hoc signed; not Apple notarized. macOS may require an explicit security override.')
+    changes_path = Path(__file__).resolve().parents[1] / 'RELEASE_NOTES.md'
+    changes = changes_path.read_text(encoding='utf-8').strip() if changes_path.is_file() else ''
     notes = f'''Complete offline installers for Repentance **1.7.9b.J835**.
+
+{changes}
 
 | Download | Installation |
 | --- | --- |

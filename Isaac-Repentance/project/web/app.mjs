@@ -1,4 +1,4 @@
-import {MAX_BACKUP_BYTES,parseBackup,parseNativeSaves,collectNativeSaves,collectSaveFiles,createBackup,applyBackup} from './save_helpers.mjs';
+import {MAX_BACKUP_BYTES,parseBackup,parseNativeSaves,collectNativeSaves,collectSaveFiles,createBackup,applyBackup,createSaveChangeTracker} from './save_helpers.mjs';
 import {openModStore,prepareModFromZip,prepareModFromFiles,mountMods} from './mod_helpers.mjs';
 import {openDiskStorage} from './disk_storage.mjs';
 import {createTouchControls} from './touch_controls.mjs';
@@ -10,16 +10,17 @@ const AUTO_SAVE_ERROR='自动保存失败，请打开菜单导出存档，并查
 const keys=new Uint8Array(349),inputSources=new Map();
 const mouse={x:-1,y:-1,buttons:new Array(8).fill(0)};
 const logs=[];
-let game,savePromise,saveTimer,persistentReady=false,pendingImport=null,previousMods=null,ending=false;
+let game,savePromise,saveTimer,saveChanges=null,persistentReady=false,pendingImport=null,previousMods=null,ending=false;
 let modStore,installedMods=[],storageReady=false,busy=false,capabilityReady=false;
 let consoleOpening=false,consoleClosing=false,consoleOpeningFrame=0,consoleGeneration=0,consoleSending=false,consolePulse=0;
+let consoleKeyboardInset=-1;
 const fpsMetrics=createFpsMetrics();
 let fpsEligible=false,fpsLastPaint=0,fpsWasEnabled=null;
 window.isaacReport={phase:'initializing',logs,frames:0,mods:[],installedMods:[]};
 $('start').disabled=true;
 function log(value){const line=String(value);logs.push(line);if(logs.length>2000)logs.shift();$('log').textContent=logs.slice(-160).join('\n');$('log').scrollTop=$('log').scrollHeight;}
 function status(value,error=false){$('status').textContent=value;$('status-dock').dataset.error=String(error);}
-function message(id,value){if($(id))$(id).textContent=value;}
+function message(id,value){const element=$(id);if(element&&element.textContent!==value)element.textContent=value;}
 function isIdle(){return window.isaacReport.phase==='idle';}
 function isRunning(){return window.isaacReport.phase==='running';}
 const selectedMods=()=>installedMods.filter(mod=>mod.enabled).map(mod=>mod.id);
@@ -71,17 +72,19 @@ function gamePresent(timestamp,eligible){
   fpsEligible=eligible===true&&isRunning()&&!document.hidden&&document.body.dataset.mode==='game'&&!game?.isaacState.paused;
   fpsMetrics.record(timestamp,fpsEligible);
 }
-function interruptFpsSampling(){fpsMetrics.breakSampling();fpsEligible=false;fpsLastPaint=0;window.isaacReport.performance={...fpsMetrics.snapshot(),sampling:false};}
+function interruptFpsSampling(){fpsMetrics.breakSampling();fpsEligible=false;fpsLastPaint=0;window.isaacReport.performance={...fpsMetrics.snapshot({detailed:$('fps-mode').value==='detailed'}),sampling:false};}
 function paintFps(force=false){
   const enabled=$('fps-enabled').checked,visible=enabled&&isRunning()&&document.body.dataset.mode==='game';
-  $('fps-panel').hidden=!visible;
+  if($('fps-panel').hidden===visible)$('fps-panel').hidden=!visible;
   if(!visible)return;
   const now=performance.now();if(!force&&now-fpsLastPaint<500)return;fpsLastPaint=now;
-  const metrics=fpsMetrics.snapshot(),number=value=>value===null?'—':value.toFixed(1);
+  const detailed=$('fps-mode').value==='detailed',metrics=fpsMetrics.snapshot({detailed}),number=value=>value===null?'—':value.toFixed(1);
   message('fps-current',number(fpsEligible?metrics.currentFps:null));
-  message('fps-average',number(metrics.averageFps));message('fps-low-1',number(metrics.low1Fps));message('fps-low-01',number(metrics.low01Fps));
-  message('fps-frametime',number(fpsEligible?metrics.frameTimeMs:null));
-  message('fps-sample-note',!fpsEligible?(metrics.sampleCount?'暂停统计':'等待进入游戏'):metrics.sampleCount<100?'采样中…':metrics.sampleCount<1000?'0.1% Low 采样中…':'最近 60 秒游玩');
+  if(detailed){
+    message('fps-average',number(metrics.averageFps));message('fps-low-1',number(metrics.low1Fps));message('fps-low-01',number(metrics.low01Fps));
+    message('fps-frametime',number(fpsEligible?metrics.frameTimeMs:null));
+    message('fps-sample-note',!fpsEligible?(metrics.sampleCount?'暂停统计':'等待进入游戏'):metrics.sampleCount<100?'采样中…':metrics.sampleCount<1000?'0.1% Low 采样中…':'最近 60 秒游玩');
+  }
   window.isaacReport.performance={...metrics,sampling:fpsEligible};
 }
 function updateFpsSettings(){
@@ -106,10 +109,11 @@ function updateConsoleInput(){
   const visible=isRunning()&&document.body.dataset.mode==='game'&&$('console-enabled').checked&&$('touch-enabled').checked&&!consoleClosing&&(open||consoleOpening);
   const panel=$('console-input-panel');
   if(panel.hidden===visible){panel.hidden=!visible;if(!visible&&panel.contains(document.activeElement))$('console-command').blur();}
-  $('console-submit').disabled=consoleSending||!open;
+  const submitDisabled=consoleSending||!open;
+  if($('console-submit').disabled!==submitDisabled)$('console-submit').disabled=submitDisabled;
   const viewport=window.visualViewport;
   const inset=visible&&viewport?Math.max(0,innerHeight-viewport.height-viewport.offsetTop):0;
-  document.documentElement.style.setProperty('--console-keyboard-offset',`${inset}px`);
+  if(inset!==consoleKeyboardInset){consoleKeyboardInset=inset;document.documentElement.style.setProperty('--console-keyboard-offset',`${inset}px`);}
 }
 for(const type of ['resize','scroll'])window.visualViewport?.addEventListener(type,updateConsoleInput);
 async function consoleFrames(count,generation=consoleGeneration){
@@ -294,8 +298,16 @@ $('import-save').onchange=async()=>{
   finally{busy=false;updateStart();}
 };
 function browserSync(populate){return new Promise((resolve,reject)=>game.FS.syncfs(populate,error=>error?reject(error):resolve()));}
-async function syncfs(populate){
-  if(!diskStorage)return browserSync(populate);
+async function syncfs(populate,{force=true}={}){
+  if(!populate&&!force&&saveChanges&&!saveChanges.dirty)return;
+  // Captured before the synchronous snapshot, acknowledged only on successful
+  // commit. Native writes made during the await remain dirty for the next save.
+  const generation=saveChanges?.generation;
+  if(!diskStorage){
+    await browserSync(populate);
+    if(!populate&&generation!==undefined)saveChanges.acknowledge(generation);
+    return;
+  }
   if(populate){
     const stored=await diskStorage.readSaves();
     if(!stored.revision&&!stored.files.length){
@@ -312,9 +324,17 @@ async function syncfs(populate){
       window.isaacReport.migratedSaveFiles=legacy.length;
       if(legacy.length)log(`已将 ${legacy.length} 个旧浏览器存档文件复制到项目；浏览器原数据保留。`);
     }else applyBackup(game.FS,stored);
-  }else await diskStorage.writeSaves(collectSaveFiles(game.FS,{allowEmpty:true}));
+  }else{
+    await diskStorage.writeSaves(collectSaveFiles(game.FS,{allowEmpty:true}));
+    if(generation!==undefined)saveChanges.acknowledge(generation);
+  }
 }
-function persist(){if(!savePromise)savePromise=syncfs(false).finally(()=>{savePromise=null;});return savePromise;}
+function persist({force=true}={}){
+  // A background/export request needs a fresh snapshot after an earlier save;
+  // sharing that earlier promise could omit writes made while it was in flight.
+  if(savePromise)return force?savePromise.then(()=>persist({force:true})):savePromise;
+  savePromise=syncfs(false,{force}).finally(()=>{savePromise=null;});return savePromise;
+}
 window.isaacHost={async flushForExit(){
   clearInput();pauseHost(true);
   if(savePromise)await savePromise;
@@ -340,10 +360,10 @@ function configureDebugConsole(FS,enabled){
   }else source+=(source&&!source.endsWith('\n')?newline:'')+'[Options]'+newline+'EnableDebugConsole='+value+newline;
   FS.mkdirTree(folder);FS.writeFile(path,Uint8Array.from(source,char=>char.charCodeAt(0)));
 }
-async function autoSave(){
+async function autoSave({force=false}={}){
   if(!persistentReady||ending)return false;
   try{
-    await persist();window.isaacReport.savedAt=new Date().toISOString();
+    await persist({force});window.isaacReport.savedAt=new Date().toISOString();
     if(window.isaacReport.saveError){delete window.isaacReport.saveError;status('');}
     return true;
   }catch(error){
@@ -410,14 +430,14 @@ for(const type of ['keydown','keyup'])window.addEventListener(type,event=>{
   if(key!==null){setInput(`keyboard-${key}`,type==='keydown'?[key]:[]);event.preventDefault();}
 });
 window.addEventListener('blur',clearInput);
-document.addEventListener('visibilitychange',()=>{clearInput();if(isRunning())pauseHost(document.hidden||document.body.dataset.mode!=='game');if(document.hidden)autoSave();});
+document.addEventListener('visibilitychange',()=>{clearInput();if(isRunning())pauseHost(document.hidden||document.body.dataset.mode!=='game');if(document.hidden)autoSave({force:true});});
 // Native wrappers deliver lifecycle events even when the WebView's visibility
 // state does not change. Resume to the launcher menu, keeping gameplay paused.
 window.addEventListener('isaac:native-state',event=>{
   clearInput();
   if(event.detail?.isActive===false){
     if(isRunning()){$('open-menu').click();pauseHost(true);}
-    autoSave();
+    autoSave({force:true});
   }
 });
 window.addEventListener('isaac:native-back',()=>{
@@ -457,7 +477,7 @@ $('start').onclick=async()=>{
     const [{default:createGame},manifest]=await Promise.all([import('./j835_game.mjs'),fetch('./asset-manifest.json').then(r=>{if(!r.ok)throw new Error(`资源清单 HTTP ${r.status}`);return r.json();})]);
     game=await createGame({noInitialRun:true,canvas,print:log,printErr:log,onAbort:reason=>{window.isaacReport.abort=String(reason);},onExit:code=>{window.isaacReport.exitCode=code;},
       isaacInput:keys,isaacTextInput:[],isaacMouse:mouse,isaacState:{frames:0,paused:false,consoleOpen:false,consolePhase:0,onPresent:$('fps-enabled').checked?gamePresent:null},isaacAudioContext:audioContext,
-      isaacGLChecks:new URL(location.href).searchParams.get('glchecks')||'frame',isaacMaxFrames:Number(new URL(location.href).searchParams.get('frames')||0)});
+      isaacGLChecks:new URL(location.href).searchParams.get('glchecks')||'release',isaacMaxFrames:Number(new URL(location.href).searchParams.get('frames')||0)});
     window.isaacGame=game;
     game.FS.mkdirTree('/game/user');game.FS.mkdirTree('/game/mods');game.FS.mkdirTree('/game/data');
     if(!diskStorage){game.FS.mount(game.IDBFS,{},'/game/user');game.FS.mount(game.IDBFS,{},'/game/data');}
@@ -469,6 +489,7 @@ $('start').onclick=async()=>{
       $('import-review').hidden=true;pendingImport=null;previousMods=null;
     }
     configureDebugConsole(game.FS,$('console-enabled').checked);await syncfs(false);
+    saveChanges=createSaveChangeTracker(game.FS);
     persistentReady=true;updateStart();
     const files=manifest.files,total=files.reduce((sum,file)=>sum+file.size,0);let loaded=0;
     for(let i=0;i<files.length;i++){

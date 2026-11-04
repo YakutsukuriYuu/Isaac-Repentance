@@ -21,7 +21,7 @@ BLOCKED_DIRS = {'node_modules', 'www', 'android', 'ios', 'runtime', 'dist',
                 'output', '.build', '.test-results', 'assets', 'userdata',
                 'private', 'secrets', 'credentials', 'keys'}
 PACKAGING_FILES = (
-    'SOURCE_README.md', 'GITHUB_SETUP.md', 'VALIDATION.md', 'runtime.lock.json',
+    'SOURCE_README.md', 'GITHUB_SETUP.md', 'VALIDATION.md', 'RELEASE_NOTES.md', 'runtime.lock.json',
     'mobile/package.json', 'mobile/package-lock.json', 'mobile/capacitor.config.json',
     'mobile/PrivacyInfo.xcprivacy', 'mobile/README.md',
     'desktop/package.json', 'desktop/package-lock.json', 'desktop/main.mjs',
