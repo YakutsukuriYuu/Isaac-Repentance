@@ -1,3 +1,22 @@
+## 0.1.2 — Reduce guest dispatch overhead
+
+- Enable the existing translated-function lookup cache and dense import-slot
+  lookup in the Wasm core. Repeated targets use exact-key cache hits; collisions,
+  changed registrations and unknown targets retain the original fallback.
+- Enable indexed GL token dispatch instead of scanning the 73-entry registry
+  for every typed graphics call. Keep stack, argument and memory validation.
+  This path relies on the current single-CPU, single-thread Wasm runtime.
+- Cache the alpha-test uniform values already submitted to each shader program.
+  Relinking, deletion and direct guest writes invalidate the corresponding cache.
+
+This is a follow-up to a user report of 43.1 average FPS and substantial slow
+frames on Android. These changes remove confirmed redundant work; that report
+alone does not identify the dominant bottleneck or establish a regression from
+0.1.1. No device benchmark was run, and no measured FPS gain or stable 60 FPS is
+claimed. Compilation and installer integrity checks are separate from gameplay
+performance. Frame counting, game speed and the previous buffering policy remain
+unchanged.
+
 ## 0.1.1 — Mobile performance update
 
 - Reuse three frames of GPU streaming buffers. Reserve a complete draw before

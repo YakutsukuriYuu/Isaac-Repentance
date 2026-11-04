@@ -40,7 +40,7 @@ from this source export.
 Download complete installers from
 [the latest Release](https://github.com/YakutsukuriYuu/Isaac-Repentance/releases/latest).
 Release downloads do not require a GitHub login and do not expire after seven days.
-See the [current release notes](packaging/RELEASE_NOTES.md) for the 0.1.1 mobile
+See the [current release notes](packaging/RELEASE_NOTES.md) for the 0.1.2 mobile
 performance changes and their validation scope.
 
 See [GitHub setup](packaging/GITHUB_SETUP.md) for resource storage,
@@ -127,7 +127,7 @@ In the development workspace, explicitly select and validate the new core before
 creating a new private archive:
 
 ```sh
-python3 packaging/scripts/runtime_inputs.py pack --project Isaac-Repentance/project --output .release-inputs/isaac-j835-runtime-v2.tar.gz
+python3 packaging/scripts/runtime_inputs.py pack --project Isaac-Repentance/project --output .release-inputs/isaac-j835-runtime-v3.tar.gz
 ```
 
 This updates `packaging/runtime.lock.json`. Upload the new archive privately and

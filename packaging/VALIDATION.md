@@ -4,12 +4,21 @@ This file distinguishes source preparation, package compilation, and real gamepl
 The current game target is Repentance 1.7.9b.J835. No mobile performance claim is
 implied by generating a native project or an installer.
 
+Version 0.1.2 enables the existing exact-key guest lookup cache and indexed GL
+token dispatch, and avoids resubmitting unchanged alpha-test uniforms. It was
+prepared by static code review and compilation, without a device benchmark.
+The user's Android report for the previous release showed 43.1 average FPS,
+12.6 FPS 1% Low and 11.5 FPS 0.1% Low. It confirms continuing stutter, but cannot
+separate CPU work, GPU waits and browser scheduling or establish a before/after
+regression. The new dispatch paths remove redundant work; they do not establish
+performance acceptance or a universal 60 FPS guarantee.
+
 Version 0.1.1 replaces the private core with a production build and changes GPU
 streaming, save scheduling, touch rendering and Android display preferences.
 It was prepared through code review, syntax checks and compilation. No new
 physical-device gameplay or performance benchmark was run for this update.
 The gameplay measurements below describe the earlier 0.1.0 core and must not be
-treated as performance acceptance for 0.1.1.
+treated as performance acceptance for 0.1.1 or 0.1.2.
 
 ## Automated checks
 
