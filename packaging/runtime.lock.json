@@ -1,10 +1,10 @@
 {
   "format": "isaac-private-runtime-v1",
   "target": "Repentance 1.7.9b.J835",
-  "archive": "isaac-j835-runtime-v4.tar.gz",
-  "sha256": "3f0f85be261beec46b925314b4e443c69615835d1b8241a8140f45a358821218",
-  "bytes": 1083990251,
-  "unpackedBytes": 1111200582,
+  "archive": "isaac-j835-runtime-v5.tar.gz",
+  "sha256": "3199cf817eb7ff58a7ba97d8d129bfcd0db0e63c8ce3f091ad342583aaf9012b",
+  "bytes": 1083990294,
+  "unpackedBytes": 1111200694,
   "fileCount": 45,
   "core": [
     {
@@ -14,8 +14,8 @@
     },
     {
       "path": "core/j835_game.wasm",
-      "size": 27730556,
-      "sha256": "c7f83ae0b7781fa2b606508b21934099c25578b6f28a08c7e105372de0034fe7"
+      "size": 27730668,
+      "sha256": "7d5dd21c307a7bbbe5d11e78039adb824708cd2807aabbfa136b92e0a92f7624"
     }
   ],
   "assetManifest": {

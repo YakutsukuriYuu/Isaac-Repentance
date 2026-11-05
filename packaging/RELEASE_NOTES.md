@@ -1,3 +1,9 @@
+## 0.1.7 — Stop iOS waiting on each draw
+
+- A normal room submits about 30 draws. On iOS, WebKit waits inside the vertex upload when that buffer still has a draw in flight, so the frame itself took about 27 ms (high 20s to mid 30s FPS). Each draw now gets fresh buffer storage; the previous draw keeps its old copy. The picture does not change, and the WebGL pixel probe still passes.
+- The extra Metal frame used to request 60 Hz shared the GPU with the game and could stall the game thread. It is gone. The scene still asks for 60 Hz, and the game screen still does not bounce.
+- This replaces the Wasm core. Low Power Mode and heat can still refuse 60 Hz. Re-sign the unsigned IPA before installing.
+
 ## 0.1.6 — Scroll the settings page and stop the iOS frame-rate jump
 
 - The settings sheet is taller than a phone in landscape, and the iOS web view had scrolling turned off, so the last controls could not be reached by touch. The launcher is now the only scrollport, with space under the fixed status line. The game screen still does not scroll or bounce.

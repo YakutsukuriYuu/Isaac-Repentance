@@ -138,8 +138,8 @@
     },
     {
       "path": "packaging/RELEASE_NOTES.md",
-      "bytes": 6875,
-      "sha256": "1e3c70dde31bf26ea198882e3dc5da1bb5f6cca1891cc410d865b05002325773"
+      "bytes": 7581,
+      "sha256": "a5afce06ba2ed914d9f178dcd4d8a2259d3e2af4b4b3b808d50a7ee60d782a24"
     },
     {
       "path": "packaging/SOURCE_README.md",
@@ -179,12 +179,12 @@
     {
       "path": "packaging/desktop/package-lock.json",
       "bytes": 127582,
-      "sha256": "00d7ce27ea7338de457e47543ffeb777c7966460531c45882ac3d676984818b6"
+      "sha256": "968000d8696d8ea1795a39b498d29ea258fb8165f3a2f4c10b83c9e6148b603e"
     },
     {
       "path": "packaging/desktop/package.json",
       "bytes": 548,
-      "sha256": "dc3779a5ad8282cbf8e0c418b821a8d2b083c393ac81c94080829a905a6582e6"
+      "sha256": "6ddf461cb943f2afbebc24e870387abdc73453259f428afa09665a836824477e"
     },
     {
       "path": "packaging/desktop/runtime-server.mjs",
@@ -219,12 +219,12 @@
     {
       "path": "packaging/mobile/package-lock.json",
       "bytes": 58634,
-      "sha256": "533b98580008b5b8e390a693254d5da3380a4197757ef0842e2f404e4c095245"
+      "sha256": "0825bb66b9ecf866c0b373353a08ed202a9e0aa2d20bffb6664564e41d0775c8"
     },
     {
       "path": "packaging/mobile/package.json",
       "bytes": 662,
-      "sha256": "8a1f18da3364b5d737b374df8bf834bdff31e81589cd9dc07bc1d99ff4d1f813"
+      "sha256": "8ca74fd6a630023ab90920c5c4c7f28e9eff25aadc97c392498680c154bd24a8"
     },
     {
       "path": "packaging/mobile/scripts/build-android.mjs",
@@ -238,8 +238,8 @@
     },
     {
       "path": "packaging/mobile/scripts/prepare.mjs",
-      "bytes": 18166,
-      "sha256": "fc33302f6177d9674944bf333ced75aaea3702ae84cf96a67f4f6824cf54feaf"
+      "bytes": 15981,
+      "sha256": "26b2d748b774fcd4802436c42dc9a4449c2e83c3e6e920eae2e813b7d4903cfd"
     },
     {
       "path": "packaging/mobile/src/bootstrap.mjs",
@@ -259,7 +259,7 @@
     {
       "path": "packaging/runtime.lock.json",
       "bytes": 766,
-      "sha256": "4701360b16825b602af7e1bf31936fb33a1beb877cd5087d2037f8d1eee552db"
+      "sha256": "158565f8e3cc7c51fe367281ba2dd329b5ca37a16545dc78ddd19b1ae6e1d9c7"
     },
     {
       "path": "packaging/scripts/export_source.py",
