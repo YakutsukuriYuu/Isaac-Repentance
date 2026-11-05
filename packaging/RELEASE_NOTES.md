@@ -1,3 +1,22 @@
+## 0.1.4 — Lift the iOS ProMotion frame-rate cap
+
+- iOS builds were capped near 45 FPS on ProMotion devices. iOS 15+ throttles
+  web-content `requestAnimationFrame` in WKWebView to a power-saving refresh
+  tier (observed near 45 Hz), so the game could not present at 60 FPS no matter
+  how the browser pacing scheduled frames. The browser pacing loop in
+  `web_loop.c` was separately verified robust under jitter and variable refresh
+  and is unchanged.
+- The iOS packaging now sets `CADisableMinimumFrameDurationOnPhone` in
+  Info.plist, which lifts that default cap so the WebView is supplied frames at
+  the device refresh rate, and anchors the scene to a steady 60 Hz preference
+  through an idle `CADisplayLink` (`CAFrameRateRange` min/max/preferred = 60).
+  This is the iOS counterpart to the existing Android `preferredRefreshRate`
+  hint; both are display preferences, so thermal and battery policy still win.
+- Packaging-only change. The pinned Wasm core, game resources, saves and the
+  Android/macOS builds are unchanged. This removes a software frame-rate cap;
+  sustained on-device FPS still depends on the device and scene and has not been
+  benchmarked on a physical iPhone in this release.
+
 ## 0.1.3 — Remove per-frame GPU waits from WebGL queries
 
 - The game asks for renderbuffer parameters and framebuffer completeness every
