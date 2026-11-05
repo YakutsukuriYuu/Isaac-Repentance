@@ -1,3 +1,9 @@
+## 0.1.5 — Keep the iOS game loop on a 60 Hz grid
+
+- ProMotion can deliver `requestAnimationFrame` at a power-saving tier near 48 Hz. The game waits on that callback, so the loop cannot present faster than it, which shows up as about 45 FPS. Drawing work is not the cap: a desktop frame was already about 2.4 ms.
+- On iOS the launcher now also wakes that wait with a 60 Hz timer. A faster display callback still wins, and `cancelAnimationFrame` cancels both. The native scene asks for a 60–120 Hz range with 60 preferred, instead of an exact 60 Hz hint iOS can ignore.
+- This does not change the Wasm core, Android refresh hint, or game speed. Low Power Mode and thermal limits can still refuse the display request. Re-sign the unsigned IPA before installing.
+
 ## 0.1.4 — Lift the iOS ProMotion frame-rate cap
 
 - iOS builds were capped near 45 FPS on ProMotion devices. iOS 15+ throttles

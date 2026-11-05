@@ -197,12 +197,10 @@ public class MainActivity extends BridgeActivity implements DisplayManager.Displ
     if (!/platforms: \[\.iOS\(/.test(manifest)) throw new Error('Review the generated Swift Package deployment target');
     await writeFile(swiftPackage, manifest.replace(/platforms: \[[^\n]+\],/, 'platforms: [.iOS("27.0")],'));
   }
-  // Anchor the scene's content cadence to 60 Hz. With the minimum-frame-duration
-  // cap lifted above, ProMotion can supply up to 120 Hz; this idle CADisplayLink
-  // declares a steady 60 Hz preference so the system neither drops the webview
-  // to a power-saving VRR tier (the ~45 FPS symptom) nor burns battery at 120.
-  // It is a preference, not a system override; thermal and battery policy win.
-  // Mirrors the Android MainActivity preferGameFrameRate hint.
+  // Ask ProMotion not to sit in the ~48Hz power tier. Minimum 60 is the floor;
+  // maximum 120 leaves room for the system to choose 60 or 120. An exact
+  // 60/60/60 range is easy for iOS to ignore when the callback does no drawing.
+  // Thermal limits and Low Power Mode remain authoritative.
   await writeFile('ios/App/App/SceneDelegate.swift', `import UIKit
 import Capacitor
 import QuartzCore
@@ -218,24 +216,28 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = CAPBridgeViewController()
         window?.makeKeyAndVisible()
 
-        startFrameRatePreference()
+        preferFrameRate()
 
         SceneDelegateProxy.shared.scene(scene, willConnectTo: session, options: connectionOptions)
     }
 
-    private func startFrameRatePreference() {
-        frameRateLink?.invalidate()
-        let link = CADisplayLink(target: self, selector: #selector(onDisplayTick))
-        // A fixed 60 Hz content preference. Keeping min == max == preferred stops
-        // the display pipeline from favouring a lower VRR tier for this content.
-        link.preferredFrameRateRange = CAFrameRateRange(minimum: 60, maximum: 60, preferred: 60)
-        link.add(to: .main, forMode: .common)
-        frameRateLink = link
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        preferFrameRate()
+    }
+
+    private func preferFrameRate() {
+        UIApplication.shared.isIdleTimerDisabled = true
+        let link = frameRateLink ?? CADisplayLink(target: self, selector: #selector(onDisplayTick))
+        link.preferredFrameRateRange = CAFrameRateRange(minimum: 60, maximum: 120, preferred: 60)
+        if frameRateLink == nil {
+            link.add(to: .main, forMode: .common)
+            frameRateLink = link
+        }
     }
 
     @objc private func onDisplayTick(_ link: CADisplayLink) {
-        // The game drives its own rendering through the WebView's
-        // requestAnimationFrame loop; this link only expresses the rate range.
+        // The game loop waits on the WebView's requestAnimationFrame. This link
+        // only publishes the rate range; it must not present or touch WebGL.
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

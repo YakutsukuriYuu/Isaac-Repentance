@@ -5,6 +5,31 @@ import {createTouchControls} from './touch_controls.mjs';
 import {createTouchLayout,TOUCH_LAYOUT_KEY} from './touch_layout.mjs';
 import {createFpsMetrics} from './fps_metrics.mjs';
 
+// iOS can deliver requestAnimationFrame at a ProMotion power tier near 48Hz.
+// The game waits on that callback, so the loop cannot exceed it. A deadline
+// timer keeps wakes on a 60Hz grid; a faster display callback still wins.
+if(globalThis.IsaacNative?.platform==='ios'&&typeof window.requestAnimationFrame==='function'){
+  const nativeFrame=window.requestAnimationFrame.bind(window),nativeCancel=window.cancelAnimationFrame.bind(window);
+  const frameMs=1000/60,pending=new Map();
+  let nextId=1,lastFinish=0;
+  window.requestAnimationFrame=callback=>{
+    const id=nextId++,slot={done:false,timer:0,frame:0};
+    const finish=stamp=>{
+      if(slot.done)return;
+      slot.done=true;pending.delete(id);clearTimeout(slot.timer);nativeCancel(slot.frame);
+      lastFinish=performance.now();callback(stamp);
+    };
+    const since=lastFinish?performance.now()-lastFinish:0;
+    slot.timer=setTimeout(()=>finish(performance.now()),Math.max(0,frameMs-since));
+    slot.frame=nativeFrame(finish);pending.set(id,slot);return id;
+  };
+  window.cancelAnimationFrame=id=>{
+    const slot=pending.get(id);
+    if(!slot||slot.done)return;
+    slot.done=true;pending.delete(id);clearTimeout(slot.timer);nativeCancel(slot.frame);
+  };
+}
+
 const $=id=>document.getElementById(id);
 const AUTO_SAVE_ERROR='自动保存失败，请打开菜单导出存档，并查看运行日志。';
 const keys=new Uint8Array(349),inputSources=new Map();

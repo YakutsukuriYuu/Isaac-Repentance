@@ -63,8 +63,8 @@
     },
     {
       "path": "Isaac-Repentance/project/web/app.mjs",
-      "bytes": 39559,
-      "sha256": "7032e5f15c2335ba0e68afa5c1b6f5011901c4edc486de85d548dab4e958feef"
+      "bytes": 40789,
+      "sha256": "6b9de341abc79d34bc50e2f3f176774eda94c5de9e79d833f2a7eb67f948218a"
     },
     {
       "path": "Isaac-Repentance/project/web/disk_storage.mjs",
@@ -138,8 +138,8 @@
     },
     {
       "path": "packaging/RELEASE_NOTES.md",
-      "bytes": 5200,
-      "sha256": "df1648c4a400240f2e327a65e79fff982638c8c6463f4b2e81150113fbbe9696"
+      "bytes": 5965,
+      "sha256": "efbb8a9230a51758b5f9230a18a6e8fa51b8f882319665645fa065cc2cc5e3d8"
     },
     {
       "path": "packaging/SOURCE_README.md",
@@ -179,12 +179,12 @@
     {
       "path": "packaging/desktop/package-lock.json",
       "bytes": 127582,
-      "sha256": "ca803620fa49ec21f489729cd122535413e655fff1c72fd9fa25d159442d8df2"
+      "sha256": "ca983670b90540dfe84214a42c860fe987ca65bd6b18afcf513ade8f8cf2a06f"
     },
     {
       "path": "packaging/desktop/package.json",
       "bytes": 548,
-      "sha256": "f2ef2a342939dfc79f4193b194baede651c9b1831ce386244118a7700f0de884"
+      "sha256": "8faa0dcd8f58354b2054efbcb89ce012ae7b19dcfcf684a1215e990626a204d8"
     },
     {
       "path": "packaging/desktop/runtime-server.mjs",
@@ -219,12 +219,12 @@
     {
       "path": "packaging/mobile/package-lock.json",
       "bytes": 58634,
-      "sha256": "b602e88c0b2dc576e799b538af9ec67cc3564fe4867ee4fb1d32983e2569892a"
+      "sha256": "8a461b02256d02ecdf7259a4447f03950b143900de44a4b9f0206156d93b7365"
     },
     {
       "path": "packaging/mobile/package.json",
       "bytes": 662,
-      "sha256": "4267f8e67e7d96a4447e1ca9699bfc83f94a1b391fdd5caf760f0d6b4c1520cc"
+      "sha256": "87b207ad8754f0e932ac01deaff1f584dcaa430b285ba398af612d1cd3e461b9"
     },
     {
       "path": "packaging/mobile/scripts/build-android.mjs",
@@ -238,8 +238,8 @@
     },
     {
       "path": "packaging/mobile/scripts/prepare.mjs",
-      "bytes": 15857,
-      "sha256": "49b4a8342026de06ff3de7aa956531af9c0ab9138e3740aa8965c58cb5341d06"
+      "bytes": 15687,
+      "sha256": "ecea3d9dda30f5ac9102ac8294e5a3619e963cf073109016614e3ec950d24cd4"
     },
     {
       "path": "packaging/mobile/src/bootstrap.mjs",
