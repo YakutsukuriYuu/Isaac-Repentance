@@ -45,3 +45,10 @@ body[data-mode=game] .status-dock:not([data-error=true]){display:none}
 @media(max-height:500px) and (min-width:600px){.fps-panel{min-height:30px;padding-top:4px;padding-bottom:4px}.fps-panel[data-mode=detailed]{width:100px;top:calc(max(10px,env(safe-area-inset-top)) + 38px);padding:4px 5px}}
 
 @media(min-height:600px) and (max-aspect-ratio:8/5){.fps-panel[data-mode=simple]{left:calc(max(12px,env(safe-area-inset-left)) + 110px);top:max(10px,env(safe-area-inset-top))}}
+
+/* The menu is taller than a phone in landscape. Scroll the launcher itself and
+   keep the document at the viewport, so the fixed status line cannot cover the
+   last control and the page can move under a finger. */
+html,body{height:100%;overflow:hidden}
+#launcher{height:100dvh;max-height:100dvh;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+body[data-mode=menu] .menu-content{padding-bottom:max(96px,calc(env(safe-area-inset-bottom) + 72px))}

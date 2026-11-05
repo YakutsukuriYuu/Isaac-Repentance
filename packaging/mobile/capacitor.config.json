@@ -4,6 +4,6 @@
   "webDir": "www",
   "server": {"androidScheme": "https", "iosScheme": "capacitor", "hostname": "localhost"},
   "android": {"allowMixedContent": false, "captureInput": true},
-  "ios": {"contentInset": "never", "scrollEnabled": false, "preferredContentMode": "mobile"},
+  "ios": {"contentInset": "never", "scrollEnabled": true, "preferredContentMode": "mobile"},
   "plugins": {"SplashScreen": {"launchAutoHide": true}}
 }

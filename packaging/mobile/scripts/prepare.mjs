@@ -197,17 +197,26 @@ public class MainActivity extends BridgeActivity implements DisplayManager.Displ
     if (!/platforms: \[\.iOS\(/.test(manifest)) throw new Error('Review the generated Swift Package deployment target');
     await writeFile(swiftPackage, manifest.replace(/platforms: \[[^\n]+\],/, 'platforms: [.iOS("27.0")],'));
   }
-  // Ask ProMotion not to sit in the ~48Hz power tier. Minimum 60 is the floor;
-  // maximum 120 leaves room for the system to choose 60 or 120. An exact
-  // 60/60/60 range is easy for iOS to ignore when the callback does no drawing.
-  // Thermal limits and Low Power Mode remain authoritative.
+  // ProMotion ignores a display link that never draws and drops to a 40/48Hz
+  // tier. Present a tiny transparent drawable at a hard 60Hz so the WebView's
+  // requestAnimationFrame follows that refresh. Low Power Mode and thermal
+  // limits can still refuse. The drawable must not block or take touches.
   await writeFile('ios/App/App/SceneDelegate.swift', `import UIKit
 import Capacitor
 import QuartzCore
+import Metal
+
+private final class FramePaceView: UIView {
+    override class var layerClass: AnyClass { CAMetalLayer.self }
+    var metalLayer: CAMetalLayer { layer as! CAMetalLayer }
+}
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
     private var frameRateLink: CADisplayLink?
+    private var paceView: FramePaceView?
+    private var paceCommandQueue: MTLCommandQueue?
+    private var paceInFlight = false
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
@@ -223,26 +232,77 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneDidBecomeActive(_ scene: UIScene) {
         preferFrameRate()
+        frameRateLink?.isPaused = false
+    }
+
+    func sceneWillResignActive(_ scene: UIScene) {
+        frameRateLink?.isPaused = true
     }
 
     private func preferFrameRate() {
         UIApplication.shared.isIdleTimerDisabled = true
+        installPaceLayer()
+        keepWebViewFromBouncing()
         let link = frameRateLink ?? CADisplayLink(target: self, selector: #selector(onDisplayTick))
-        link.preferredFrameRateRange = CAFrameRateRange(minimum: 60, maximum: 120, preferred: 60)
+        link.preferredFrameRateRange = CAFrameRateRange(minimum: 60, maximum: 60, preferred: 60)
+        link.isPaused = false
         if frameRateLink == nil {
             link.add(to: .main, forMode: .common)
             frameRateLink = link
         }
     }
 
+    private func installPaceLayer() {
+        guard paceView == nil, let host = window, let device = MTLCreateSystemDefaultDevice() else { return }
+        let view = FramePaceView(frame: CGRect(x: 0, y: 0, width: 2, height: 2))
+        view.isUserInteractionEnabled = false
+        view.isAccessibilityElement = false
+        view.accessibilityElementsHidden = true
+        let layer = view.metalLayer
+        layer.device = device
+        layer.pixelFormat = .bgra8Unorm
+        layer.framebufferOnly = true
+        layer.isOpaque = false
+        layer.drawableSize = CGSize(width: 2, height: 2)
+        layer.allowsNextDrawableTimeout = true
+        layer.maximumDrawableCount = 3
+        host.addSubview(view)
+        paceView = view
+        paceCommandQueue = device.makeCommandQueue()
+    }
+
+    private func keepWebViewFromBouncing() {
+        guard let scroll = (window?.rootViewController as? CAPBridgeViewController)?.webView?.scrollView else { return }
+        scroll.bounces = false
+        scroll.alwaysBounceVertical = false
+        scroll.alwaysBounceHorizontal = false
+        scroll.contentInsetAdjustmentBehavior = .never
+    }
+
     @objc private func onDisplayTick(_ link: CADisplayLink) {
-        // The game loop waits on the WebView's requestAnimationFrame. This link
-        // only publishes the rate range; it must not present or touch WebGL.
+        guard !paceInFlight, let layer = paceView?.metalLayer, let queue = paceCommandQueue else { return }
+        guard let drawable = layer.nextDrawable(), let buffer = queue.makeCommandBuffer() else { return }
+        let pass = MTLRenderPassDescriptor()
+        pass.colorAttachments[0].texture = drawable.texture
+        pass.colorAttachments[0].loadAction = .clear
+        pass.colorAttachments[0].storeAction = .store
+        pass.colorAttachments[0].clearColor = MTLClearColorMake(0, 0, 0, 0)
+        guard let encoder = buffer.makeRenderCommandEncoder(descriptor: pass) else { return }
+        encoder.endEncoding()
+        paceInFlight = true
+        buffer.addCompletedHandler { [weak self] _ in
+            DispatchQueue.main.async { self?.paceInFlight = false }
+        }
+        buffer.present(drawable)
+        buffer.commit()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
         frameRateLink?.invalidate()
         frameRateLink = nil
+        paceView?.removeFromSuperview()
+        paceView = nil
+        paceCommandQueue = nil
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {

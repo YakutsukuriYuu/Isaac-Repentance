@@ -1,3 +1,9 @@
+## 0.1.6 — Scroll the settings page and stop the iOS frame-rate jump
+
+- The settings sheet is taller than a phone in landscape, and the iOS web view had scrolling turned off, so the last controls could not be reached by touch. The launcher is now the only scrollport, with space under the fixed status line. The game screen still does not scroll or bounce.
+- The 0.1.5 timer woke `requestAnimationFrame` with `performance.now()` and cancelled the display callback. The game ignores a timestamp that arrives early and waits for another frame, so presents alternated between about 40 and 60 FPS. That timer is removed.
+- An idle display link is easy for ProMotion to ignore, so the scene now presents a tiny transparent frame at a fixed 60 Hz. The Wasm core, Android refresh hint, and game speed are unchanged. Low Power Mode and heat can still refuse the request. Re-sign the unsigned IPA before installing.
+
 ## 0.1.5 — Keep the iOS game loop on a 60 Hz grid
 
 - ProMotion can deliver `requestAnimationFrame` at a power-saving tier near 48 Hz. The game waits on that callback, so the loop cannot present faster than it, which shows up as about 45 FPS. Drawing work is not the cap: a desktop frame was already about 2.4 ms.
