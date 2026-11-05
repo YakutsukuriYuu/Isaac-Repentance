@@ -167,7 +167,12 @@ public class MainActivity extends BridgeActivity implements DisplayManager.Displ
   await writeFile(wrapper, wrapperText.trimEnd() + '\ndistributionSha256Sum=bd71102213493060956ec229d946beee57158dbd89d0e62b91bca0fa2c5f3531\n');
 } else {
   const plist = 'ios/App/App/Info.plist';
-  const result = spawnSync('python3', ['-c', `import plistlib\np=${JSON.stringify(plist)}\nwith open(p,'rb') as f: d=plistlib.load(f)\nd['UISupportedInterfaceOrientations']=['UIInterfaceOrientationLandscapeLeft','UIInterfaceOrientationLandscapeRight']\nd['UISupportedInterfaceOrientations~ipad']=d['UISupportedInterfaceOrientations']\nd['UIFileSharingEnabled']=True\nd['LSSupportsOpeningDocumentsInPlace']=True\nd['UIStatusBarHidden']=True\nd['UIRequiredDeviceCapabilities']=['arm64']\nd['UIViewControllerBasedStatusBarAppearance']=False\nwith open(p,'wb') as f: plistlib.dump(d,f)\n`], {stdio: 'inherit'});
+  // CADisableMinimumFrameDurationOnPhone lifts the default iOS 15+ frame-rate
+  // cap on web/third-party rendered content. Without it, ProMotion devices
+  // throttle the WKWebView requestAnimationFrame supply (observed near 45 Hz),
+  // which caps the game at ~45 FPS no matter how the browser pacing schedules.
+  // This is the iOS counterpart to the Android preferredRefreshRate hint.
+  const result = spawnSync('python3', ['-c', `import plistlib\np=${JSON.stringify(plist)}\nwith open(p,'rb') as f: d=plistlib.load(f)\nd['UISupportedInterfaceOrientations']=['UIInterfaceOrientationLandscapeLeft','UIInterfaceOrientationLandscapeRight']\nd['UISupportedInterfaceOrientations~ipad']=d['UISupportedInterfaceOrientations']\nd['UIFileSharingEnabled']=True\nd['LSSupportsOpeningDocumentsInPlace']=True\nd['UIStatusBarHidden']=True\nd['UIRequiredDeviceCapabilities']=['arm64']\nd['UIViewControllerBasedStatusBarAppearance']=False\nd['CADisableMinimumFrameDurationOnPhone']=True\nwith open(p,'wb') as f: plistlib.dump(d,f)\n`], {stdio: 'inherit'});
   if (result.status !== 0) throw new Error('Cannot configure native iOS Info.plist');
   const project = 'ios/App/App.xcodeproj/project.pbxproj';
   let text = await readFile(project, 'utf8');
@@ -192,5 +197,60 @@ public class MainActivity extends BridgeActivity implements DisplayManager.Displ
     if (!/platforms: \[\.iOS\(/.test(manifest)) throw new Error('Review the generated Swift Package deployment target');
     await writeFile(swiftPackage, manifest.replace(/platforms: \[[^\n]+\],/, 'platforms: [.iOS("27.0")],'));
   }
+  // Anchor the scene's content cadence to 60 Hz. With the minimum-frame-duration
+  // cap lifted above, ProMotion can supply up to 120 Hz; this idle CADisplayLink
+  // declares a steady 60 Hz preference so the system neither drops the webview
+  // to a power-saving VRR tier (the ~45 FPS symptom) nor burns battery at 120.
+  // It is a preference, not a system override; thermal and battery policy win.
+  // Mirrors the Android MainActivity preferGameFrameRate hint.
+  await writeFile('ios/App/App/SceneDelegate.swift', `import UIKit
+import Capacitor
+import QuartzCore
+
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    var window: UIWindow?
+    private var frameRateLink: CADisplayLink?
+
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        guard let windowScene = scene as? UIWindowScene else { return }
+
+        window = UIWindow(windowScene: windowScene)
+        window?.rootViewController = CAPBridgeViewController()
+        window?.makeKeyAndVisible()
+
+        startFrameRatePreference()
+
+        SceneDelegateProxy.shared.scene(scene, willConnectTo: session, options: connectionOptions)
+    }
+
+    private func startFrameRatePreference() {
+        frameRateLink?.invalidate()
+        let link = CADisplayLink(target: self, selector: #selector(onDisplayTick))
+        // A fixed 60 Hz content preference. Keeping min == max == preferred stops
+        // the display pipeline from favouring a lower VRR tier for this content.
+        link.preferredFrameRateRange = CAFrameRateRange(minimum: 60, maximum: 60, preferred: 60)
+        link.add(to: .main, forMode: .common)
+        frameRateLink = link
+    }
+
+    @objc private func onDisplayTick(_ link: CADisplayLink) {
+        // The game drives its own rendering through the WebView's
+        // requestAnimationFrame loop; this link only expresses the rate range.
+    }
+
+    func sceneDidDisconnect(_ scene: UIScene) {
+        frameRateLink?.invalidate()
+        frameRateLink = nil
+    }
+
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        SceneDelegateProxy.shared.scene(scene, openURLContexts: URLContexts)
+    }
+
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        SceneDelegateProxy.shared.scene(scene, continue: userActivity)
+    }
+}
+`);
 }
 console.log(`Prepared ${platform}: bundled game resources, native DAT storage and Chinese launcher.`);

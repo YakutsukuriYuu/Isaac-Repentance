@@ -238,8 +238,8 @@
     },
     {
       "path": "packaging/mobile/scripts/prepare.mjs",
-      "bytes": 13050,
-      "sha256": "29b1c5ec9d30ec4502fcec5e0689fe4b525f4c5542c465838d6fb21b263f717d"
+      "bytes": 15857,
+      "sha256": "49b4a8342026de06ff3de7aa956531af9c0ab9138e3740aa8965c58cb5341d06"
     },
     {
       "path": "packaging/mobile/src/bootstrap.mjs",
