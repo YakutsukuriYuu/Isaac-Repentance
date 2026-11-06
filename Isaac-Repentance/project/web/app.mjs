@@ -2,6 +2,7 @@ import {MAX_BACKUP_BYTES,parseBackup,parseNativeSaves,collectNativeSaves,collect
 import {openModStore,prepareModFromZip,prepareModFromFiles,mountMods} from './mod_helpers.mjs';
 import {openDiskStorage} from './disk_storage.mjs';
 import {createTouchControls} from './touch_controls.mjs';
+import {createGamepadSource} from './gamepad_input.mjs';
 import {createTouchLayout,TOUCH_LAYOUT_KEY} from './touch_layout.mjs';
 import {createFpsMetrics} from './fps_metrics.mjs';
 
@@ -57,7 +58,8 @@ function persistSettings(layout=currentLayout){
 }
 function rememberSettings(){persistSettings().catch(error=>{log(error);status(`设置保存失败：${error.message||error}`);});}
 function setInput(source,codes){if(codes.length)inputSources.set(source,new Set(codes));else inputSources.delete(source);keys.fill(0);for(const set of inputSources.values())for(const code of set)keys[code]=1;}
-const touch=createTouchControls({root:$('touch'),onKeys:setInput});
+const pads=createGamepadSource();
+const touch=createTouchControls({root:$('touch'),onPad:state=>{pads.setTouch(state);pads.publish(game);}});
 const touchLayout=createTouchLayout({root:$('touch'),editor:$('touch-layout-editor'),
   initialValue:currentLayout,onSave:value=>persistSettings(value),listenToStorage:!diskStorage,
   onOpen:()=>{clearInput();pauseHost(true);},
@@ -69,6 +71,8 @@ $('touch-enabled').onchange=()=>{rememberSettings();updateTouch();};
 $('start-fullscreen').onchange=rememberSettings;
 $('console-enabled').onchange=()=>{rememberSettings();updateTouch();};
 function gamePresent(timestamp,eligible){
+  pads.publish(game);
+  if(!$('fps-enabled').checked)return;
   fpsEligible=eligible===true&&isRunning()&&!document.hidden&&document.body.dataset.mode==='game'&&!game?.isaacState.paused;
   fpsMetrics.record(timestamp,fpsEligible);
 }
@@ -93,7 +97,7 @@ function updateFpsSettings(){
   $('fps-panel').dataset.mode=mode;$('fps-details').hidden=mode!=='detailed';$('fps-panel').style.opacity=String(opacity/100);
   $('fps-opacity-value').value=`${opacity}%`;
   $('fps-mode').disabled=!storageReady||!enabled;$('fps-opacity').disabled=!storageReady||!enabled;
-  if(game?.isaacState)game.isaacState.onPresent=enabled?gamePresent:null;
+  if(game?.isaacState)game.isaacState.onPresent=gamePresent;
   paintFps(true);
 }
 $('fps-enabled').onchange=()=>{updateFpsSettings();rememberSettings();};
@@ -476,7 +480,7 @@ $('start').onclick=async()=>{
     status('正在加载游戏程序…');
     const [{default:createGame},manifest]=await Promise.all([import('./j835_game.mjs'),fetch('./asset-manifest.json').then(r=>{if(!r.ok)throw new Error(`资源清单 HTTP ${r.status}`);return r.json();})]);
     game=await createGame({noInitialRun:true,canvas,print:log,printErr:log,onAbort:reason=>{window.isaacReport.abort=String(reason);},onExit:code=>{window.isaacReport.exitCode=code;},
-      isaacInput:keys,isaacTextInput:[],isaacMouse:mouse,isaacState:{frames:0,paused:false,consoleOpen:false,consolePhase:0,onPresent:$('fps-enabled').checked?gamePresent:null},isaacAudioContext:audioContext,
+      isaacInput:keys,isaacTextInput:[],isaacMouse:mouse,isaacGamepad:pads.snapshot(),isaacState:{frames:0,paused:false,consoleOpen:false,consolePhase:0,onPresent:gamePresent},isaacAudioContext:audioContext,
       isaacGLChecks:new URL(location.href).searchParams.get('glchecks')||'release',isaacMaxFrames:Number(new URL(location.href).searchParams.get('frames')||0)});
     window.isaacGame=game;
     game.FS.mkdirTree('/game/user');game.FS.mkdirTree('/game/mods');game.FS.mkdirTree('/game/data');
@@ -504,6 +508,7 @@ $('start').onclick=async()=>{
     game.FS.chdir('/game');status('');window.isaacReport.phase='running';updateStart();mode('game');canvas.focus();
     saveTimer=setInterval(autoSave,15000);
     const monitor=setInterval(()=>{window.isaacReport.frames=game.isaacState.frames||0;updateConsoleInput();paintFps();},100);
+    pads.publish(game);
     try{await game.callMain(['/game/isaac-ng.exe.unpacked.exe','/game']);}finally{clearInterval(monitor);}
     if(window.isaacReport.exitCode&&window.isaacReport.exitCode!==0)throw new Error(`游戏退出码 ${window.isaacReport.exitCode}`);
     ending=true;clearInterval(saveTimer);clearInput();

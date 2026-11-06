@@ -56,7 +56,8 @@ def source_files(root=ROOT):
                     names.add(rel.as_posix())
     web = root / 'Isaac-Repentance/project/web'
     for name in (*WEB_FILES, 'test_save_helpers.mjs', 'test_mod_helpers.mjs',
-                 'test_disk_storage.mjs', 'test_fps_metrics.mjs', 'test_session_controls.mjs'):
+                 'test_disk_storage.mjs', 'test_fps_metrics.mjs', 'test_gamepad_input.mjs',
+                 'test_session_controls.mjs'):
         names.add((web / name).relative_to(root).as_posix())
     for path in (root / 'portable/launcher').iterdir():
         if path.is_file() and (path.suffix == '.go' or path.name in {'go.mod', 'go.sum', 'README.md'}):

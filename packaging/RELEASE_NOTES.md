@@ -1,3 +1,9 @@
+## 0.1.8 — Drive the game's own controller from touch and gamepads
+
+- The on-screen sticks now feed the game's XInput controller instead of keyboard keys. The left stick moves and the right stick shoots, including light pressure. Bomb, active item, card, drop, map, pause and confirm use the game's default controller bindings.
+- A connected Bluetooth or MFi gamepad writes that same controller. The keyboard is unchanged. With virtual controls off and no gamepad connected, the game stays on keyboard only.
+- This replaces the Wasm core. Re-sign the unsigned IPA before installing.
+
 ## 0.1.7 — Stop iOS waiting on each draw
 
 - A normal room submits about 30 draws. On iOS, WebKit waits inside the vertex upload when that buffer still has a draw in flight, so the frame itself took about 27 ms (high 20s to mid 30s FPS). Each draw now gets fresh buffer storage; the previous draw keeps its old copy. The picture does not change, and the WebGL pixel probe still passes.

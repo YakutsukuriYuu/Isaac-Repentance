@@ -18,7 +18,8 @@ class SourceExportTests(unittest.TestCase):
         for name in exporter.PACKAGING_FILES:
             self.write('packaging/' + name, 'fixture public config')
         for name in (*exporter.WEB_FILES, 'test_save_helpers.mjs', 'test_mod_helpers.mjs',
-                     'test_disk_storage.mjs', 'test_fps_metrics.mjs', 'test_session_controls.mjs'):
+                     'test_disk_storage.mjs', 'test_fps_metrics.mjs', 'test_gamepad_input.mjs',
+                     'test_session_controls.mjs'):
             self.write('Isaac-Repentance/project/web/' + name, 'fixture web source')
         self.write('portable/launcher/main.go', 'package main')
         self.write('portable/launcher/go.mod', 'module fixture')

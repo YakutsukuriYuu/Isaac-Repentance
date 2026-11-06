@@ -12,18 +12,28 @@ export function stickDirections(x, y, kind='move', deadzone=0.2) {
  * onKeys(source, codes) supplies an entire independent input source each time.
  * Merge these sources with physical keyboard keys; do not replace keyboard state.
  */
-export function createTouchControls({root,onKeys}) {
-  if(!root||typeof onKeys!=='function')throw new TypeError('Touch controls need a root and onKeys callback.');
+export function createTouchControls({root,onKeys,onPad}) {
+  if(!root||(typeof onKeys!=='function'&&typeof onPad!=='function'))throw new TypeError('Touch controls need a root and an input callback.');
   const doc=root.ownerDocument, win=doc.defaultView;
   const controller=new AbortController(), signal=controller.signal;
   const states=[];
   let enabled=false,paintRequest=0;
   const listen=(target,type,callback)=>target.addEventListener(type,callback,{signal,passive:false});
   function emit(state,codes){
+    if(typeof onKeys!=='function')return;
     const next=codes.join(',');
     if(state.last===next)return;
     state.last=next;
     onKeys(state.source,codes);
+  }
+  function publishPad(){
+    if(typeof onPad!=='function')return;
+    const sticks={},keys=[];
+    for(const state of states){
+      if(state.stick)sticks[state.stick]={x:state.x||0,y:state.y||0};
+      else if(state.down)keys.push(state.key);
+    }
+    onPad({active:enabled,sticks,keys});
   }
   // Input is delivered immediately. Only the thumb's visual transform waits
   // for the next display callback, so high-rate touch samples do not cause a
@@ -47,7 +57,9 @@ export function createTouchControls({root,onKeys}) {
     if(state.thumb&&state.paintedTransform!=='translate(0px, 0px)'){
       state.thumb.style.transform='translate(0px, 0px)';state.paintedTransform='translate(0px, 0px)';
     }
-    emit(state,[]);
+    state.x=state.y=0;state.down=false;
+    if(onPad)publishPad();
+    else emit(state,[]);
     if(id!==null&&state.element.hasPointerCapture?.(id)){
       try{state.element.releasePointerCapture(id);}catch{/* The browser may already have cancelled the pointer. */}
     }
@@ -57,7 +69,7 @@ export function createTouchControls({root,onKeys}) {
     for(const state of states)release(state);
   }
   for(const element of root.querySelectorAll('[data-stick]')){
-    const state={element,source:`touch:stick:${element.dataset.stick}`,pointer:null,last:'',thumb:element.querySelector('.stick-thumb'),rect:null,pendingTransform:null,paintedTransform:null};
+    const state={element,stick:element.dataset.stick,source:`touch:stick:${element.dataset.stick}`,pointer:null,last:'',x:0,y:0,thumb:element.querySelector('.stick-thumb'),rect:null,pendingTransform:null,paintedTransform:null};
     states.push(state);
     function move(event){
       const rect=state.rect||(state.rect=element.getBoundingClientRect()),radius=Math.min(rect.width,rect.height)/2;
@@ -66,7 +78,9 @@ export function createTouchControls({root,onKeys}) {
       const y=(event.clientY-rect.top-rect.height/2)/radius;
       const distance=Math.hypot(x,y),scale=distance>1?1/distance:1;
       if(state.thumb)queueThumb(state,`translate(${(x*scale*radius*.53).toFixed(2)}px, ${(y*scale*radius*.53).toFixed(2)}px)`);
-      emit(state,stickDirections(x,y,element.dataset.stick));
+      state.x=x*scale;state.y=y*scale;
+      if(onPad)publishPad();
+      else emit(state,stickDirections(x,y,element.dataset.stick));
     }
     listen(element,'pointerdown',event=>{
       if(!enabled||state.pointer!==null||(event.pointerType==='mouse'&&event.button!==0))return;
@@ -87,12 +101,14 @@ export function createTouchControls({root,onKeys}) {
   for(const element of root.querySelectorAll('[data-key]')){
     const key=Number(element.dataset.key);
     if(!Number.isInteger(key)||key<0||key>348)continue;
-    const state={element,source:`touch:button:${key}:${index++}`,pointer:null,last:''};states.push(state);
+    const state={element,key,source:`touch:button:${key}:${index++}`,pointer:null,last:'',down:false};states.push(state);
     listen(element,'pointerdown',event=>{
       if(!enabled||element.disabled||state.pointer!==null||(event.pointerType==='mouse'&&event.button!==0))return;
       event.preventDefault();state.pointer=event.pointerId;
       try{element.setPointerCapture(event.pointerId);}catch{release(state);return;}
-      element.classList.add('active');emit(state,[key]);
+      element.classList.add('active');state.down=true;
+      if(onPad)publishPad();
+      else emit(state,[key]);
     });
     for(const type of ['pointerup','pointercancel','lostpointercapture'])listen(element,type,event=>{
       if(state.pointer===event.pointerId){event.preventDefault();release(state);}
@@ -117,7 +133,7 @@ export function createTouchControls({root,onKeys}) {
   }):null;
   geometryObserver?.observe(root,{attributes:true,attributeFilter:['style','hidden']});
   for(const state of states)geometryObserver?.observe(state.element,{attributes:true,attributeFilter:['style','hidden','disabled']});
-  function setEnabled(value){enabled=!!value;root.hidden=!enabled;if(!enabled)clear();}
+  function setEnabled(value){enabled=!!value;root.hidden=!enabled;if(!enabled)clear();else if(onPad)publishPad();}
   setEnabled(false);
   return {setEnabled,clear,destroy(){geometryObserver?.disconnect();clear();enabled=false;root.hidden=true;controller.abort();}};
 }

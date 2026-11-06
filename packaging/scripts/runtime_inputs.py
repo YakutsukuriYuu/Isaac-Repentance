@@ -25,7 +25,7 @@ FORMAT = 'isaac-private-runtime-v1'
 MAX_BYTES = 2 * 1024**3
 WEB_FILES = ('index.html', 'styles.css', 'app.mjs', 'save_helpers.mjs',
              'mod_helpers.mjs', 'disk_storage.mjs', 'touch_controls.mjs',
-             'touch_layout.mjs', 'fps_metrics.mjs')
+             'touch_layout.mjs', 'fps_metrics.mjs', 'gamepad_input.mjs')
 
 
 def digest(path):

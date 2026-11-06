@@ -31,6 +31,7 @@ jobs:
           node Isaac-Repentance/project/web/test_mod_helpers.mjs
           node Isaac-Repentance/project/web/test_disk_storage.mjs
           node Isaac-Repentance/project/web/test_fps_metrics.mjs
+          node Isaac-Repentance/project/web/test_gamepad_input.mjs
       - name: Check mobile storage bridge
         run: node --test packaging/mobile/tests/*.test.mjs
       - name: Check desktop lifecycle
