@@ -1,3 +1,8 @@
+## 0.1.11 — Accept the secret-room color ramp
+
+- Entering a secret room uploads a 256 by 1 color table in the desktop `GL_ABGR_EXT` layout. WebGL2 rejects that format, and the port treated the rejection as fatal, so the process stopped. The table is now reordered to RGBA and uploaded normally.
+- Re-sign the unsigned IPA before installing.
+
 ## 0.1.10 — Keep diagonal stick movement even
 
 - Stick axes were scaled separately, so a diagonal push was slower than a straight one and snapped onto the nearest straight direction. The deadzone is now the whole stick: direction stays where the finger is, and every direction reaches full speed at the rim.
