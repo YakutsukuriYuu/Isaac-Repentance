@@ -1,3 +1,8 @@
+## 0.1.10 — Keep diagonal stick movement even
+
+- Stick axes were scaled separately, so a diagonal push was slower than a straight one and snapped onto the nearest straight direction. The deadzone is now the whole stick: direction stays where the finger is, and every direction reaches full speed at the rim.
+- Bindings and the Wasm core are unchanged.
+
 ## 0.1.9 — Actually enable the game's controller
 
 - 0.1.8 wrote the virtual sticks and a Bluetooth pad into an XInput state, but this port skipped controller startup and read only the keyboard. The sticks no longer wrote keys, so neither control did anything.

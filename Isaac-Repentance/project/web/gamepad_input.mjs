@@ -21,13 +21,17 @@ const TOUCH_KEYS={
   257:{bits:BUTTON.A},
 };
 
-export function axisToI16(value,deadzone=0.18){
-  if(!Number.isFinite(value))return 0;
-  const clamped=Math.max(-1,Math.min(1,value));
-  const magnitude=Math.abs(clamped);
-  if(magnitude<=deadzone)return 0;
+function toI16(value){return Math.max(-32768,Math.min(32767,Math.round(value*32767)))||0;}
+
+/** One deadzone for the whole stick, then scale so every direction reaches the rim together. */
+export function mapStick(x,y,deadzone=0.12){
+  if(!Number.isFinite(x)||!Number.isFinite(y))return [0,0];
+  let magnitude=Math.hypot(x,y);
+  if(magnitude<=deadzone||magnitude===0)return [0,0];
+  if(magnitude>1){x/=magnitude;y/=magnitude;magnitude=1;}
   const scaled=(magnitude-deadzone)/(1-deadzone);
-  return Math.max(-32768,Math.min(32767,Math.round(scaled*32767)*Math.sign(clamped)));
+  const gain=scaled/magnitude;
+  return [toI16(x*gain),toI16(y*gain)];
 }
 
 function blank(){return {connected:false,buttons:0,lt:0,rt:0,lx:0,ly:0,rx:0,ry:0};}
@@ -38,10 +42,8 @@ export function touchToXInput(touch){
   out.connected=true;
   const move=touch.sticks?.move||{};
   const shoot=touch.sticks?.shoot||{};
-  out.lx=axisToI16(move.x||0);
-  out.ly=axisToI16(-(move.y||0));
-  out.rx=axisToI16(shoot.x||0);
-  out.ry=axisToI16(-(shoot.y||0));
+  [out.lx,out.ly]=mapStick(move.x||0,-(move.y||0));
+  [out.rx,out.ry]=mapStick(shoot.x||0,-(shoot.y||0));
   for(const key of touch.keys||[]){
     const mapped=TOUCH_KEYS[key];
     if(!mapped)continue;
@@ -57,10 +59,8 @@ export function physicalToXInput(pad){
   if(!pad?.connected)return out;
   out.connected=true;
   const axes=pad.axes||[];
-  out.lx=axisToI16(axes[0]||0,0.15);
-  out.ly=axisToI16(-(axes[1]||0),0.15);
-  out.rx=axisToI16(axes[2]||0,0.15);
-  out.ry=axisToI16(-(axes[3]||0),0.15);
+  [out.lx,out.ly]=mapStick(axes[0]||0,-(axes[1]||0),0.15);
+  [out.rx,out.ry]=mapStick(axes[2]||0,-(axes[3]||0),0.15);
   const buttons=pad.buttons||[];
   const down=index=>!!buttons[index]&&(buttons[index].pressed||buttons[index].value>0.5);
   const value=index=>buttons[index]?Math.round(Math.max(0,Math.min(1,buttons[index].value||0))*255):0;

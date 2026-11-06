@@ -78,8 +78,8 @@
     },
     {
       "path": "Isaac-Repentance/project/web/gamepad_input.mjs",
-      "bytes": 3754,
-      "sha256": "013cfd704e2fba5111e7a9aefb01a5415d531172809026c57b9a4e29581a76f4"
+      "bytes": 3908,
+      "sha256": "742916a9f6a51a9b001a9be02c7359c757248002d31ca6950e0958a3d96e3ebc"
     },
     {
       "path": "Isaac-Repentance/project/web/index.html",
@@ -113,8 +113,8 @@
     },
     {
       "path": "Isaac-Repentance/project/web/test_gamepad_input.mjs",
-      "bytes": 1958,
-      "sha256": "c9458b45c504189c33d141d84fb5ee533e82b78a34ed999b7693f80e5262dcaa"
+      "bytes": 2135,
+      "sha256": "d8c58fc584b369ef007bc99279738fa63d0f355b0b769f6ae4075b73093578a3"
     },
     {
       "path": "Isaac-Repentance/project/web/test_mod_helpers.mjs",
@@ -148,8 +148,8 @@
     },
     {
       "path": "packaging/RELEASE_NOTES.md",
-      "bytes": 8660,
-      "sha256": "b18358abc2bbd8116103bfed8e7f200dce84eed5a0879e847df310740affa45c"
+      "bytes": 9015,
+      "sha256": "fa51ff8a5d04457b851b2581f8aac1752477df05cf849d1e9364b0a72ea560f2"
     },
     {
       "path": "packaging/SOURCE_README.md",
@@ -188,13 +188,13 @@
     },
     {
       "path": "packaging/desktop/package-lock.json",
-      "bytes": 127582,
-      "sha256": "f4a8f716887163d975b1dbee59f855f0eb9f5c69aa9d75111314cb27ee2514eb"
+      "bytes": 127584,
+      "sha256": "c9d18547898dfe9bbb26351db2ef45d009196cbeb8d4d35dd47a8b5ca6d94569"
     },
     {
       "path": "packaging/desktop/package.json",
-      "bytes": 548,
-      "sha256": "4201acaa0591df9613392bdfe0f9afac170468ef7864bff11c498c0fbad5ef67"
+      "bytes": 549,
+      "sha256": "5813ec1f86bfccc92550ba510e7e6932be8e5a1bfe143c71fead666c95d144e8"
     },
     {
       "path": "packaging/desktop/runtime-server.mjs",
@@ -228,13 +228,13 @@
     },
     {
       "path": "packaging/mobile/package-lock.json",
-      "bytes": 58634,
-      "sha256": "095b7991c93bdd5bc652923960a4f52eddbc21a7b034ccabe482fc63e5d12b17"
+      "bytes": 58636,
+      "sha256": "41454938301f4df2fb94042fa8b4580afe75d0a7b303294cd5c93267bb4a9b92"
     },
     {
       "path": "packaging/mobile/package.json",
-      "bytes": 662,
-      "sha256": "2c9aa88b6fff63b69829bda1276dc0391ddd046e4ddf077fca7e76c65356a102"
+      "bytes": 663,
+      "sha256": "43f9de0f59f0fbcc7e2d41c5cd85154e4aeb83837e4b4c0b858e54ded6b3dcbb"
     },
     {
       "path": "packaging/mobile/scripts/build-android.mjs",
