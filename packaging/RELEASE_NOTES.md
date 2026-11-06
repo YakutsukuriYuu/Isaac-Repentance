@@ -1,3 +1,9 @@
+## 0.1.9 — Actually enable the game's controller
+
+- 0.1.8 wrote the virtual sticks and a Bluetooth pad into an XInput state, but this port skipped controller startup and read only the keyboard. The sticks no longer wrote keys, so neither control did anything.
+- The game now keeps its original XInput startup. DirectInput and the Windows device-notification thread are still skipped, because a web view has neither. Keyboard play is unchanged.
+- Re-sign the unsigned IPA before installing.
+
 ## 0.1.8 — Drive the game's own controller from touch and gamepads
 
 - The on-screen sticks now feed the game's XInput controller instead of keyboard keys. The left stick moves and the right stick shoots, including light pressure. Bomb, active item, card, drop, map, pause and confirm use the game's default controller bindings.

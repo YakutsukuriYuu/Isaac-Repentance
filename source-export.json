@@ -148,8 +148,8 @@
     },
     {
       "path": "packaging/RELEASE_NOTES.md",
-      "bytes": 8167,
-      "sha256": "29d8cce64dd02980fa612f9bf057e27139714435fda37828076c8c6b392e37d2"
+      "bytes": 8660,
+      "sha256": "b18358abc2bbd8116103bfed8e7f200dce84eed5a0879e847df310740affa45c"
     },
     {
       "path": "packaging/SOURCE_README.md",
@@ -189,12 +189,12 @@
     {
       "path": "packaging/desktop/package-lock.json",
       "bytes": 127582,
-      "sha256": "4b89ed280b877125aa6be7f5cb5593c024acab85295c49d4863e0260184dc467"
+      "sha256": "f4a8f716887163d975b1dbee59f855f0eb9f5c69aa9d75111314cb27ee2514eb"
     },
     {
       "path": "packaging/desktop/package.json",
       "bytes": 548,
-      "sha256": "760a0aae17272d5fcd21b0d28231187e854ff63e2b8a97fac25d9cf8cd8c5b28"
+      "sha256": "4201acaa0591df9613392bdfe0f9afac170468ef7864bff11c498c0fbad5ef67"
     },
     {
       "path": "packaging/desktop/runtime-server.mjs",
@@ -229,12 +229,12 @@
     {
       "path": "packaging/mobile/package-lock.json",
       "bytes": 58634,
-      "sha256": "b64003220dc2d487a0213b14455bbc1e91a64b8e9364e1118e035025bd68896f"
+      "sha256": "095b7991c93bdd5bc652923960a4f52eddbc21a7b034ccabe482fc63e5d12b17"
     },
     {
       "path": "packaging/mobile/package.json",
       "bytes": 662,
-      "sha256": "5d62f6375a269664d66017f7f05bb7c8c605eeffa173141159dbafe80b4d2ef6"
+      "sha256": "2c9aa88b6fff63b69829bda1276dc0391ddd046e4ddf077fca7e76c65356a102"
     },
     {
       "path": "packaging/mobile/scripts/build-android.mjs",
@@ -269,7 +269,7 @@
     {
       "path": "packaging/runtime.lock.json",
       "bytes": 766,
-      "sha256": "70b9a29080b249d2a5dac110815c64614ae9c6dfff22e40e44753188f361a141"
+      "sha256": "2a4b3b22c06c583df32dd7a57a1d27d56e7a5d45197bf9567e79f949a4952d12"
     },
     {
       "path": "packaging/scripts/export_source.py",
