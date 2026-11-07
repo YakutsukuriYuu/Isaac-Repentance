@@ -26,9 +26,45 @@ globalThis.fetch = (input, options) => {
   return fetchOriginal(input, options);
 };
 
+function bytesFromBase64(value) {
+  const binary = atob(value), bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+const folderPicks = new Map();
+let folderPickId = 0;
+globalThis.isaacModFolderResult = payload => {
+  const pending = folderPicks.get(payload?.id);
+  if (!pending) return;
+  folderPicks.delete(payload.id);
+  if (payload.cancelled) pending.resolve(null);
+  else if (payload.error) pending.reject(new Error(payload.error));
+  else pending.resolve(payload);
+};
 globalThis.IsaacNative = Object.freeze({
   isNative: true,
   platform: Capacitor.getPlatform(),
+  async pickModFolder() {
+    if (Capacitor.getPlatform() !== 'ios' || !globalThis.webkit?.messageHandlers?.isaacPickModFolder) {
+      throw new Error('此系统不能直接选择文件夹，请把 Mod 打成 ZIP 再导入。');
+    }
+    const id = `mod-folder-${++folderPickId}`;
+    const picked = await new Promise((resolve, reject) => {
+      folderPicks.set(id, {resolve, reject});
+      globalThis.webkit.messageHandlers.isaacPickModFolder.postMessage({id});
+    });
+    if (!picked) return null;
+    const records = [];
+    try {
+      for (const path of picked.files || []) {
+        const result = await Filesystem.readFile({path: `isaac-mod-import/${picked.token}/${path}`, directory: Directory.Cache});
+        records.push({path, data: bytesFromBase64(result.data)});
+      }
+    } finally {
+      await Filesystem.rmdir({path: `isaac-mod-import/${picked.token}`, directory: Directory.Cache, recursive: true}).catch(() => {});
+    }
+    return records;
+  },
   async exportFile(data, filename, type) {
     if (typeof filename !== 'string' || !/^[A-Za-z0-9_.-]{1,128}$/.test(filename)) throw new Error('导出文件名无效。');
     const bytes = typeof data === 'string' ? new TextEncoder().encode(data) : data instanceof Uint8Array ? data : new Uint8Array(data);

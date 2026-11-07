@@ -203,10 +203,17 @@ public class MainActivity extends BridgeActivity implements DisplayManager.Displ
   await writeFile('ios/App/App/SceneDelegate.swift', `import UIKit
 import Capacitor
 import QuartzCore
+import WebKit
+import UniformTypeIdentifiers
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+class SceneDelegate: UIResponder, UIWindowSceneDelegate, WKScriptMessageHandler, UIDocumentPickerDelegate {
     var window: UIWindow?
     private var frameRateLink: CADisplayLink?
+    private var folderPickerInstalled = false
+    private var folderPickId: String?
+    private let folderImportLimit = 256 * 1024 * 1024
+    private let folderFileLimit = 128 * 1024 * 1024
+    private let folderCountLimit = 10000
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
@@ -216,6 +223,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.makeKeyAndVisible()
 
         preferFrameRate()
+        installFolderPicker()
 
         SceneDelegateProxy.shared.scene(scene, willConnectTo: session, options: connectionOptions)
     }
@@ -239,6 +247,106 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             link.add(to: .main, forMode: .common)
             frameRateLink = link
         }
+    }
+
+    private func bridgeWebView() -> WKWebView? {
+        (window?.rootViewController as? CAPBridgeViewController)?.webView
+    }
+
+    private func installFolderPicker() {
+        guard !folderPickerInstalled, let webView = bridgeWebView() else { return }
+        webView.configuration.userContentController.add(self, name: "isaacPickModFolder")
+        folderPickerInstalled = true
+    }
+
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard message.name == "isaacPickModFolder" else { return }
+        let body = message.body as? [String: Any]
+        let id = body?["id"] as? String ?? ""
+        DispatchQueue.main.async {
+            guard self.folderPickId == nil, !id.isEmpty, let presenter = self.window?.rootViewController else {
+                self.finishFolderPick(id: id, error: "文件夹选择器正忙，请稍后再试。")
+                return
+            }
+            self.folderPickId = id
+            let picker = UIDocumentPickerViewController(forOpeningContentTypes: [UTType.folder], asCopy: false)
+            picker.delegate = self
+            picker.allowsMultipleSelection = false
+            presenter.present(picker, animated: true)
+        }
+    }
+
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+        let id = folderPickId
+        folderPickId = nil
+        if let id { finishFolderPick(id: id, cancelled: true) }
+    }
+
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        let id = folderPickId
+        folderPickId = nil
+        guard let id, let url = urls.first else { return }
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let token = UUID().uuidString
+                let files = try self.copyModFolder(url, token: token)
+                DispatchQueue.main.async { self.finishFolderPick(id: id, token: token, files: files) }
+            } catch {
+                DispatchQueue.main.async { self.finishFolderPick(id: id, error: error.localizedDescription) }
+            }
+        }
+    }
+
+    private func copyModFolder(_ url: URL, token: String) throws -> [String] {
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+        let root = url.standardizedFileURL
+        let caches = try FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+        let destination = caches.appendingPathComponent("isaac-mod-import/\\(token)", isDirectory: true)
+        try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
+        guard let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey, .isDirectoryKey], options: [.skipsHiddenFiles]) else {
+            throw NSError(domain: "IsaacDocuments", code: 1, userInfo: [NSLocalizedDescriptionKey: "无法读取所选文件夹。"])
+        }
+        var files: [String] = []
+        var total = 0
+        let rootPath = root.path
+        while let item = enumerator.nextObject() as? URL {
+            let values = try item.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey, .isDirectoryKey])
+            if values.isSymbolicLink == true {
+                throw NSError(domain: "IsaacDocuments", code: 2, userInfo: [NSLocalizedDescriptionKey: "Mod 不能包含符号链接。"])
+            }
+            if values.isDirectory == true || values.isRegularFile != true { continue }
+            let size = values.fileSize ?? 0
+            if size > folderFileLimit || total > folderImportLimit - size {
+                throw NSError(domain: "IsaacDocuments", code: 3, userInfo: [NSLocalizedDescriptionKey: "Mod 超过 256 MiB 或单个文件超过 128 MiB。"])
+            }
+            let full = item.standardizedFileURL.path
+            guard full.hasPrefix(rootPath + "/") else { continue }
+            let relative = String(full.dropFirst(rootPath.count + 1))
+            if relative.split(separator: "/").contains(where: { $0 == "__MACOSX" || $0 == ".git" || $0 == ".DS_Store" || $0.hasPrefix("._") }) { continue }
+            if files.count >= folderCountLimit {
+                throw NSError(domain: "IsaacDocuments", code: 4, userInfo: [NSLocalizedDescriptionKey: "请选择一个 Mod 文件夹（最多 10000 个文件）。"])
+            }
+            let target = destination.appendingPathComponent(relative)
+            try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try FileManager.default.copyItem(at: item, to: target)
+            files.append(relative)
+            total += size
+        }
+        if files.isEmpty {
+            throw NSError(domain: "IsaacDocuments", code: 5, userInfo: [NSLocalizedDescriptionKey: "Mod 文件夹中没有可导入的文件。"])
+        }
+        return files
+    }
+
+    private func finishFolderPick(id: String, token: String? = nil, files: [String] = [], cancelled: Bool = false, error: String? = nil) {
+        guard let webView = bridgeWebView() else { return }
+        var payload: [String: Any] = ["id": id]
+        if cancelled { payload["cancelled"] = true }
+        if let error { payload["error"] = error }
+        if let token { payload["token"] = token; payload["files"] = files }
+        guard let data = try? JSONSerialization.data(withJSONObject: payload), let json = String(data: data, encoding: .utf8) else { return }
+        webView.evaluateJavaScript("window.isaacModFolderResult(\\(json))", completionHandler: nil)
     }
 
     private func keepWebViewFromBouncing() {

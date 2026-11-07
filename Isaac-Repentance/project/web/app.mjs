@@ -268,6 +268,28 @@ async function importMod(kind,input){
 }
 $('import-mod-zip').onchange=()=>importMod('zip',$('import-mod-zip'));
 $('import-mod-folder').onchange=()=>importMod('folder',$('import-mod-folder'));
+if(globalThis.IsaacNative?.platform==='ios'){
+  // iOS matches the file picker by system type, not by ".dat". An accept
+  // filter greys out Repentance saves. The importer still checks the name.
+  $('import-save').removeAttribute('accept');
+  document.querySelector('label[for="import-mod-folder"]')?.addEventListener('click',async event=>{
+    if($('import-mod-folder').disabled||!isIdle()||busy)return;
+    event.preventDefault();event.stopPropagation();
+    let records;
+    try{records=await globalThis.IsaacNative.pickModFolder();}
+    catch(error){message('mod-status',`操作失败：${error.message||error}`);return;}
+    if(!records?.length)return;
+    await modMutation(async()=>{
+      message('mod-status','正在读取并检查 Mod…');
+      const mod=await prepareModFromFiles(records);
+      const existed=installedMods.some(item=>item.id===mod.id);
+      const installed=await modStore.install(mod,{replace:true});
+      if(pendingImport&&!pendingImport.native)await modStore.setEnabled(mod.id,pendingImport.selectedMods.includes(mod.id));
+      message('mod-status',`${mod.name} 已${existed?'更新':'导入'}。${pendingImport&&!pendingImport.native?'已按存档备份设置启用状态。':installed.enabled?'已启用，下次启动游戏时加载。':'当前已停用，可勾选后启用。'}`);
+    });
+    updateImportSummary();
+  },true);
+}
 async function chooseMods(ids){await modStore.setSelection(ids);await refreshMods();}
 function updateImportSummary(){
   if(!pendingImport)return;
