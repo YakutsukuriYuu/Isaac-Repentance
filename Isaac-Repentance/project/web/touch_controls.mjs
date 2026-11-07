@@ -19,6 +19,13 @@ export function createTouchControls({root,onKeys,onPad}) {
   const states=[];
   let enabled=false,paintRequest=0;
   const listen=(target,type,callback)=>target.addEventListener(type,callback,{signal,passive:false});
+  const elementOf=node=>node?.nodeType===1?node:node?.parentElement;
+  const editable=node=>elementOf(node)?.closest?.('input,textarea')||null;
+  const playingSurface=node=>elementOf(node)?.closest?.('#game-view,.touch-controls')||null;
+  function clearSelection(){const selection=win.getSelection?.();if(!selection||selection.isCollapsed||editable(selection.anchorNode)||!playingSurface(selection.anchorNode))return;selection.removeAllRanges();}
+  listen(doc,'selectstart',event=>{if(!editable(event.target)&&playingSurface(event.target))event.preventDefault();});
+  listen(doc,'selectionchange',clearSelection);
+  listen(doc,'gesturestart',event=>{if(!editable(event.target)&&playingSurface(event.target))event.preventDefault();});
   function emit(state,codes){
     if(typeof onKeys!=='function')return;
     const next=codes.join(',');

@@ -1,6 +1,6 @@
 /** Player-owned touch placement. The editor uses inert visual copies: no game input. */
 export const TOUCH_LAYOUT_KEY='isaacJ835.touchLayout.v1';
-const IDS=['move','shoot','key-69','key-32','key-81','key-341','key-258','key-256','key-257','key-96'];
+const IDS=['move','shoot','key-69','key-32','key-81','key-341','key-348','key-258','key-256','key-257','key-96'];
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 const finite=(value,fallback,min,max)=>typeof value==='number'&&Number.isFinite(value)?clamp(value,min,max):fallback;
 const idFor=element=>element.dataset.stick||`key-${element.dataset.key}`;
@@ -26,7 +26,7 @@ export function createTouchLayout({root,editor,onOpen=()=>{},onClose=()=>{},onEr
   }
   const orientation=()=>win.innerWidth>win.innerHeight?'landscape':'portrait';
   function geometry(id,value,screen=dimensions()){
-    const short=Math.min(screen.width,screen.height),stick=id==='move'||id==='shoot',menu=['key-258','key-256','key-257','key-96'].includes(id);
+    const short=Math.min(screen.width,screen.height),stick=id==='move'||id==='shoot',menu=['key-348','key-258','key-256','key-257','key-96'].includes(id);
     const base=stick?clamp(short*.30,88,136):menu?clamp(short*.16,48,70):clamp(short*.125,40,52);
     const top=screen.top+64,bottom=screen.height-screen.bottom-(stick?30:8);
     const width=Math.min(base*value.size,screen.width-screen.left-screen.right-16,Math.max(28,bottom-top));
@@ -43,6 +43,7 @@ export function createTouchLayout({root,editor,onOpen=()=>{},onClose=()=>{},onEr
       'key-69':[edge-20-button*2.5-18,bottom-74-stick-button/2],
       'key-32':[edge-20-button*1.5-9,bottom-74-stick-button/2],
       'key-81':[edge-20-button*.5,bottom-74-stick-button/2],
+      'key-348':[screen.width/2-2*menu-16,bottom-16-menu*.31],
       'key-258':[screen.width/2-menu-8,bottom-16-menu*.31],
       'key-256':[screen.width/2,bottom-16-menu*.31],
       'key-257':[screen.width/2+menu+8,bottom-16-menu*.31],
@@ -102,10 +103,10 @@ export function createTouchLayout({root,editor,onOpen=()=>{},onClose=()=>{},onEr
   function open(){
     if(opened)return;onOpen();opened=true;draft=structuredClone(saved);oldFocus=doc.activeElement;
     oldOverflow=doc.body.style.overflow;doc.body.style.overflow='hidden';
-    inertStates=Array.from(editor.parentElement.children).filter(element=>element!==editor&&['MAIN','SECTION','DIV','FOOTER','HEADER'].includes(element.tagName)).map(element=>({element,inert:element.inert}));
+    inertStates=Array.from(editor.parentElement.children).filter(element=>element!==editor&&element.id!=='game-view'&&['MAIN','SECTION','DIV','FOOTER','HEADER'].includes(element.tagName)).map(element=>({element,inert:element.inert}));
     for(const state of inertStates)state.element.inert=true;
     editor.hidden=false;$('touch-layout-panel').hidden=false;$('touch-layout-panel-toggle').setAttribute('aria-expanded','true');$('touch-layout-panel-toggle').textContent='收起面板';
-    $('touch-layout-status').textContent='';render();$('touch-layout-control').focus({preventScroll:true});
+    $('touch-layout-status').textContent='';render();editor.focus({preventScroll:true});
   }
   function close(){
     if(!opened||saving)return;releaseDrag();opened=false;draft=null;editor.hidden=true;doc.body.style.overflow=oldOverflow;

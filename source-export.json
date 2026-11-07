@@ -78,13 +78,13 @@
     },
     {
       "path": "Isaac-Repentance/project/web/gamepad_input.mjs",
-      "bytes": 3908,
-      "sha256": "742916a9f6a51a9b001a9be02c7359c757248002d31ca6950e0958a3d96e3ebc"
+      "bytes": 3930,
+      "sha256": "073f97e0bef6ebbeb00ee9cea297a984adc1d7504fe4269a20a267d2faf08270"
     },
     {
       "path": "Isaac-Repentance/project/web/index.html",
-      "bytes": 18998,
-      "sha256": "d7e0eb10bc08149d2e2c1ac5e5aa82e62e3fb83fb7881744cf65369d9a9e8c5c"
+      "bytes": 19100,
+      "sha256": "b33b6224e44913178dc15623143eb76d6aff5ea6c070fa867fb74700507ca092"
     },
     {
       "path": "Isaac-Repentance/project/web/mod_helpers.mjs",
@@ -98,8 +98,8 @@
     },
     {
       "path": "Isaac-Repentance/project/web/styles.css",
-      "bytes": 33137,
-      "sha256": "6d24d6bfbeb3a1cb5a99595f70a64afba81e2a28d8b2b07f7c45ac82e7ffa242"
+      "bytes": 33394,
+      "sha256": "8e115e19e4715b469b597d455eaec6b62a88584d9ab3365812fea59295427251"
     },
     {
       "path": "Isaac-Repentance/project/web/test_disk_storage.mjs",
@@ -113,8 +113,8 @@
     },
     {
       "path": "Isaac-Repentance/project/web/test_gamepad_input.mjs",
-      "bytes": 2135,
-      "sha256": "d8c58fc584b369ef007bc99279738fa63d0f355b0b769f6ae4075b73093578a3"
+      "bytes": 2276,
+      "sha256": "15eb90e2399d5495fa01389f0e9c9501b9cf3e895240c0e875d85d950c093ea6"
     },
     {
       "path": "Isaac-Repentance/project/web/test_mod_helpers.mjs",
@@ -133,13 +133,13 @@
     },
     {
       "path": "Isaac-Repentance/project/web/touch_controls.mjs",
-      "bytes": 7303,
-      "sha256": "cded4bd287b2121c0929494c7068e1464a9825db8c213234921aaf7975f8cd61"
+      "bytes": 8037,
+      "sha256": "4daca8e58c4788ca30c71c623e1c0d95444b3f5fcd92938cc590a95765e71396"
     },
     {
       "path": "Isaac-Repentance/project/web/touch_layout.mjs",
-      "bytes": 12618,
-      "sha256": "a7c69fbfa053eb2e00ea4bd0118b3ca68cfaab7bd0f1bca11d072335a8f88915"
+      "bytes": 12708,
+      "sha256": "31a4950e7b7861d4ee9e0275ca313a4e1a6198a3c3d19edb35c7f3ab90e7e73d"
     },
     {
       "path": "packaging/GITHUB_SETUP.md",

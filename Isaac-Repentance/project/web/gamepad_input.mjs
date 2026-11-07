@@ -9,15 +9,16 @@ const BUTTON={
   A:0x1000,B:0x2000,X:0x4000,Y:0x8000,
 };
 
-/** The game's default controller rows: bomb, active, card, drop, pause, map. */
+/** Launcher key numbers. 348 is the on-screen menu key, not a keyboard key. */
 const TOUCH_KEYS={
   69:{bits:BUTTON.LB},
   32:{lt:255},
   81:{bits:BUTTON.RB},
   341:{rt:255},
   345:{rt:255},
+  348:{bits:BUTTON.START},
   258:{bits:BUTTON.BACK},
-  256:{bits:BUTTON.START},
+  256:{bits:BUTTON.B},
   257:{bits:BUTTON.A},
 };
 

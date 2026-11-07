@@ -18,8 +18,11 @@ assert.equal(touch.ly,-diagonal);
 assert.equal(touch.rx,-32767);
 assert.equal(touch.ry,0);
 assert.equal(touch.buttons&0x0100,0x0100);
-assert.equal(touch.buttons&0x0010,0x0010);
+assert.equal(touch.buttons&0x2000,0x2000);
+assert.equal(touch.buttons&0x0010,0);
 assert.equal(touch.lt,255);
+const menuKey=touchToXInput({active:true,sticks:{},keys:[348]});
+assert.equal(menuKey.buttons,0x0010);
 assert.equal(touchToXInput({active:false,sticks:{move:{x:1,y:0}},keys:[69]}).connected,false);
 
 const button=(pressed,value=pressed?1:0)=>({pressed,value});
