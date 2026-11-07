@@ -66,8 +66,8 @@ class ReleaseTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.artifacts = self.root / 'artifacts'
         paths = [
-            'Isaac-Repentance-Android/Isaac-Repentance-android-release.apk',
-            'Isaac-Repentance-iOS/Isaac-Repentance-ios-unsigned.ipa',
+            'Isaac-Repentance-Android/Isaac-Repentance-0.1.0-android.apk',
+            'Isaac-Repentance-iOS/Isaac-Repentance-0.1.0-ios-unsigned.ipa',
             'Isaac-Repentance-macOS-arm64/Isaac-Repentance-0.1.0-arm64.dmg',
             'Isaac-Repentance-macOS-x64/Isaac-Repentance-0.1.0-x64.dmg',
         ]
@@ -146,23 +146,21 @@ class ReleaseTests(unittest.TestCase):
     def test_signed_ipa_notes_are_independent_of_mac_signing_flag(self):
         unsigned = self.selected['ios']['path']
         unsigned.unlink()
-        signed = unsigned.parent / 'ios-signed/App.ipa'
+        signed = unsigned.parent / 'ios-signed/Isaac-Repentance-0.1.0-ios.ipa'
         signed.parent.mkdir()
         signed.write_bytes(b'synthetic signed export')
         selected = publisher.inventory(self.artifacts)
-        _, notes = publisher.prepare_metadata(selected, self.details, self.root / 'signed-metadata')
-        text = notes.read_text()
-        self.assertIn('Signed device export', text)
-        self.assertIn('not Apple notarized', text)
-        self.assertNotIn('Unsigned device IPA', text)
+        self.assertTrue(selected['ios']['name'].endswith('-ios.ipa'))
 
     def test_checksums_and_notes_describe_only_the_four_installers(self):
         sums = self.records[-1]['path'].read_text().splitlines()
         self.assertEqual(len(sums), 4)
         for record in self.records[:-1]:
             self.assertIn(record['digest'].removeprefix('sha256:') + '  ' + record['name'], sums)
-        self.assertIn(self.env['GITHUB_SHA'], self.notes.read_text())
-        self.assertIn('Unsigned device IPA', self.notes.read_text())
+        text = self.notes.read_text()
+        self.assertIn(f'isaac-release-source: {self.env["GITHUB_SHA"]}', text)
+        self.assertNotIn('Unsigned', text)
+        self.assertNotIn('Complete offline', text)
 
     def test_fresh_release_publishes_only_after_all_assets_are_verified(self):
         url = self.publish()

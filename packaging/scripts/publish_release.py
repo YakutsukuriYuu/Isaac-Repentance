@@ -65,19 +65,21 @@ def inventory(directory):
         if not path.is_file():
             raise ValueError('Release inputs must be regular files')
         relative = path.relative_to(directory)
-        if path.name == 'Isaac-Repentance-android-release.apk':
+        versioned = re.fullmatch(
+            r'Isaac-Repentance-([A-Za-z0-9][A-Za-z0-9._-]*)-(android\.apk|ios-unsigned\.ipa|ios\.ipa|(?:arm64|x64)\.dmg)',
+            path.name)
+        if not versioned:
+            raise ValueError(f'Unexpected release input: {relative}')
+        versions.add(versioned.group(1))
+        suffix = versioned.group(2)
+        if suffix == 'android.apk':
             kind = 'android'
-        elif path.name == 'Isaac-Repentance-ios-unsigned.ipa':
-            kind = 'ios'
-        elif ('ios-signed' in relative.parts[:-1]
-              and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]*\.ipa', path.name)):
+        elif suffix in {'ios-unsigned.ipa', 'ios.ipa'}:
+            if suffix == 'ios.ipa' and 'ios-signed' not in relative.parts[:-1]:
+                raise ValueError(f'Unexpected release input: {relative}')
             kind = 'ios'
         else:
-            match = re.fullmatch(r'Isaac-Repentance-([A-Za-z0-9][A-Za-z0-9._-]*)-(arm64|x64)\.dmg', path.name)
-            if not match:
-                raise ValueError(f'Unexpected release input: {relative}')
-            versions.add(match.group(1))
-            kind = 'macos-' + match.group(2)
+            kind = 'macos-' + suffix.removesuffix('.dmg')
         if kind in selected:
             raise ValueError(f'Duplicate {kind} installer')
         selected[kind] = file_record(path)
@@ -99,39 +101,8 @@ def prepare_metadata(selected, details, directory):
         raise ValueError('Release metadata files cannot be linked')
     records = sorted(selected.values(), key=lambda record: record['name'])
     checksum_path.write_text(''.join(f'{r["digest"].removeprefix("sha256:")}  {r["name"]}\n' for r in records), encoding='utf-8')
-    repository, sha = details['repository'], details['sha']
-    signed = details['apple_signed']
-    ios_signed = selected['ios']['name'] != 'Isaac-Repentance-ios-unsigned.ipa'
-    ios = ('Signed device export; installation is limited by its provisioning profile.' if ios_signed else
-           'Unsigned device IPA; re-sign it with your sideloading tool before installation.')
-    mac = ('Developer ID signed and notarized.' if signed else
-           'Ad hoc signed; not Apple notarized. macOS may require an explicit security override.')
-    changes_path = Path(__file__).resolve().parents[1] / 'RELEASE_NOTES.md'
-    changes = changes_path.read_text(encoding='utf-8').strip() if changes_path.is_file() else ''
-    notes = f'''Complete offline installers for Repentance **1.7.9b.J835**.
-
-{changes}
-
-| Download | Installation |
-| --- | --- |
-| `{selected['android']['name']}` | Android APK signed with the project's persistent release key. |
-| `{selected['ios']['name']}` | iOS/iPadOS 27+. {ios} |
-| `{selected['macos-arm64']['name']}` | macOS 13+ on Apple silicon. {mac} |
-| `{selected['macos-x64']['name']}` | macOS 13+ on Intel. {mac} |
-
-Game resources are included. No Steam installation or first-run resource download is needed.
-Player saves and preinstalled Mods are not included. Launcher interface: Simplified Chinese.
-Android WebView and iOS WKWebView must support JSPI and WebGL 2. Physical mobile gameplay,
-memory use and Mod compatibility still require device testing.
-
-Use `SHA256SUMS.txt` to verify the downloads. GitHub's automatically generated
-**Source code** archives contain the source project, not a playable game package.
-
-Source: [{sha[:12]}](https://github.com/{repository}/commit/{sha})
-Build: [GitHub Actions run {details['run_id']}](https://github.com/{repository}/actions/runs/{details['run_id']})
-
-<!-- isaac-release-source: {sha}; run: {details['run_id']} -->
-'''
+    sha = details['sha']
+    notes = f'<!-- isaac-release-source: {sha}; run: {details["run_id"]} -->\n'
     notes_path.write_text(notes, encoding='utf-8')
     return records + [file_record(checksum_path)], notes_path
 
