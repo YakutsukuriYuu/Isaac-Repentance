@@ -1,6 +1,7 @@
 import {build, Platform, Arch} from 'electron-builder';
-import {access, readFile, open} from 'node:fs/promises';
+import {access, readFile, open, rm} from 'node:fs/promises';
 import {constants} from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
@@ -72,6 +73,10 @@ for (let attempt = 1; ; attempt++) {
   } catch (error) {
     if (attempt >= 4) throw error;
     console.warn(`${error.message}; retrying (${attempt}/3) in 30s`);
+    // A failed download can leave a half-written artifact that makes the next
+    // attempt fail differently; start from a clean output and DMG helper cache.
+    await rm(path.join(root, 'dist'), {recursive: true, force: true});
+    await rm(path.join(os.homedir(), 'Library/Caches/electron-builder/dmg-builder'), {recursive: true, force: true});
     await new Promise(resolve => setTimeout(resolve, 30000));
   }
 }
