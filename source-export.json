@@ -238,13 +238,13 @@
     },
     {
       "path": "packaging/mobile/scripts/build-android.mjs",
-      "bytes": 1851,
-      "sha256": "ec6e652a9bacccabb8eae4f9598fe2499449545a8e28e18d3248163c3c6b570d"
+      "bytes": 2133,
+      "sha256": "6ae2d0d47566b1c9913cfdee63aadc05467b3390c5bb8602bdb4b642c7028149"
     },
     {
       "path": "packaging/mobile/scripts/build-ios.mjs",
-      "bytes": 3968,
-      "sha256": "b6a1f0043b719c543cd01df07eb3a15b85049e6cbeb75ca90dfe78dfe5b1b44c"
+      "bytes": 4503,
+      "sha256": "323940e8c06654ba6d2429d9c464016986fa986a41b29d36e3b6e45141b0686e"
     },
     {
       "path": "packaging/mobile/scripts/prepare.mjs",

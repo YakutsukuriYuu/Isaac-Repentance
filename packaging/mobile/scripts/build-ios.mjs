@@ -1,5 +1,5 @@
 import {spawnSync} from 'node:child_process';
-import {mkdir, cp, access, readFile, rm} from 'node:fs/promises';
+import {mkdir, cp, access, readFile, rm, readdir, rename} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 
@@ -11,8 +11,7 @@ const run = (file, args, attempts = 1, delaySeconds = 30) => {
     if (result.status === 0) return;
     const failure = `${file} failed (${result.status ?? result.error?.message})`;
     // Swift package resolution downloads Capacitor's binary targets from GitHub
-    // Releases. An outage or gateway timeout is retried instead of failing the
-    // whole installer build.
+    // Releases. Retry a gateway timeout instead of failing the installer.
     if (attempt >= attempts) throw new Error(failure);
     console.warn(`${failure}; retrying (${attempt}/${attempts - 1}) in ${delaySeconds}s`);
     spawnSync('sleep', [String(delaySeconds)]);
@@ -20,24 +19,30 @@ const run = (file, args, attempts = 1, delaySeconds = 30) => {
 };
 const exists = async file => { try { await access(file); return true; } catch { return false; } };
 run(process.execPath, ['scripts/prepare.mjs', 'ios']);
+const {version} = JSON.parse(await readFile('package.json', 'utf8'));
+if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(version)) throw new Error('Unsafe app version');
 const project = await exists('ios/App/App.xcworkspace/contents.xcworkspacedata') ? ['-workspace', 'ios/App/App.xcworkspace'] : ['-project', 'ios/App/App.xcodeproj'];
 const common = [...project, '-scheme', 'App', '-configuration', 'Release', '-destination', 'generic/platform=iOS', 'IPHONEOS_DEPLOYMENT_TARGET=27.0'];
 await mkdir('output', {recursive: true});
 // Resolve the Swift packages first: the download is the part that fails during
-// a GitHub release outage, and a retry here is fast compared with a full build.
-run('xcodebuild', [...common, '-derivedDataPath', '.build/ios', '-resolvePackageDependencies'], 12, 30);
+// a GitHub release outage, and a retry here is much cheaper than a full build.
+run('xcodebuild', [...common, '-derivedDataPath', '.build/ios', '-resolvePackageDependencies'], 12);
 if (process.env.IOS_EXPORT_OPTIONS_PLIST) {
   if (!process.env.APPLE_TEAM_ID) throw new Error('APPLE_TEAM_ID is required for a signed iOS export');
   await access(process.env.IOS_EXPORT_OPTIONS_PLIST);
   const signing = [`DEVELOPMENT_TEAM=${process.env.APPLE_TEAM_ID}`];
   if (process.env.IOS_PROVISIONING_PROFILE_SPECIFIER) signing.push('CODE_SIGN_STYLE=Manual', `PROVISIONING_PROFILE_SPECIFIER=${process.env.IOS_PROVISIONING_PROFILE_SPECIFIER}`);
   if (process.env.IOS_CODE_SIGN_IDENTITY) signing.push(`CODE_SIGN_IDENTITY=${process.env.IOS_CODE_SIGN_IDENTITY}`);
-  run('xcodebuild', [...common, '-archivePath', '.build/Isaac.xcarchive', ...signing, 'archive'], 5);
+  run('xcodebuild', [...common, '-archivePath', '.build/Isaac.xcarchive', ...signing, 'archive'], 3);
   run('xcodebuild', ['-exportArchive', '-archivePath', '.build/Isaac.xcarchive', '-exportPath', 'output/ios-signed', '-exportOptionsPlist', process.env.IOS_EXPORT_OPTIONS_PLIST]);
+  const exported = (await readdir('output/ios-signed')).filter(name => name.endsWith('.ipa'));
+  if (exported.length !== 1) throw new Error('Signed iOS export did not produce exactly one IPA');
+  const signedName = `Isaac-Repentance-${version}-ios.ipa`;
+  if (exported[0] !== signedName) await rename(path.join('output/ios-signed', exported[0]), path.join('output/ios-signed', signedName));
   console.log('Created signed iOS export in output/ios-signed.');
 } else {
   if (process.env.REQUIRE_SIGNING === '1') throw new Error('Signed iOS export requested, but IOS_EXPORT_OPTIONS_PLIST is missing');
-  run('xcodebuild', [...common, '-derivedDataPath', '.build/ios', 'CODE_SIGNING_ALLOWED=NO', 'CODE_SIGNING_REQUIRED=NO', 'CODE_SIGN_IDENTITY=', 'build'], 3, 30);
+  run('xcodebuild', [...common, '-derivedDataPath', '.build/ios', 'CODE_SIGNING_ALLOWED=NO', 'CODE_SIGNING_REQUIRED=NO', 'CODE_SIGN_IDENTITY=', 'build'], 3);
   const built = '.build/ios/Build/Products/Release-iphoneos/App.app';
   await access(`${built}/App`);
   const contents = await readFile(`${built}/public/asset-manifest.json`, 'utf8');
@@ -45,7 +50,7 @@ if (process.env.IOS_EXPORT_OPTIONS_PLIST) {
   await rm('.build/ipa', {recursive: true, force: true});
   await mkdir('.build/ipa/Payload', {recursive: true});
   await cp(built, '.build/ipa/Payload/App.app', {recursive: true});
-  const output = path.resolve('output/Isaac-Repentance-ios-unsigned.ipa');
+  const output = path.resolve(`output/Isaac-Repentance-${version}-ios-unsigned.ipa`);
   await rm(output, {force: true});
   const result = spawnSync('/usr/bin/ditto', ['-c', '-k', '--keepParent', 'Payload', output], {cwd: '.build/ipa', stdio: 'inherit'});
   if (result.status !== 0) throw new Error('Cannot package the device IPA');
