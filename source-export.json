@@ -169,7 +169,7 @@
     {
       "path": "packaging/desktop/build.mjs",
       "bytes": 4464,
-      "sha256": "a0f187578bca8f7c12ad1c953368fb5270aed2dc4753b7cda6439a22a6597762"
+      "sha256": "e95d89453c5b4f8e7bbd3e2a2c4de8304344865f27e493bfe66c706f1ff7e2de"
     },
     {
       "path": "packaging/desktop/entitlements.adhoc.plist",
@@ -238,13 +238,13 @@
     },
     {
       "path": "packaging/mobile/scripts/build-android.mjs",
-      "bytes": 1850,
-      "sha256": "5bbcbb71d2396c142a77530b5a13ad64a8b68cb4a13e10cf269cec6ea4dd75f6"
+      "bytes": 1851,
+      "sha256": "ec6e652a9bacccabb8eae4f9598fe2499449545a8e28e18d3248163c3c6b570d"
     },
     {
       "path": "packaging/mobile/scripts/build-ios.mjs",
-      "bytes": 3650,
-      "sha256": "b91ea12162b78f9bb4d2e21fd33a663eebc94018429851c392e5edcbdc1a371f"
+      "bytes": 3968,
+      "sha256": "b6a1f0043b719c543cd01df07eb3a15b85049e6cbeb75ca90dfe78dfe5b1b44c"
     },
     {
       "path": "packaging/mobile/scripts/prepare.mjs",

@@ -5,7 +5,7 @@ import path from 'node:path';
 
 process.chdir(fileURLToPath(new URL('..', import.meta.url)));
 if (process.platform !== 'darwin') throw new Error('iOS builds require macOS and full Xcode 27 or later');
-const run = (file, args, attempts = 1) => {
+const run = (file, args, attempts = 1, delaySeconds = 30) => {
   for (let attempt = 1; ; attempt++) {
     const result = spawnSync(file, args, {stdio: 'inherit'});
     if (result.status === 0) return;
@@ -14,8 +14,8 @@ const run = (file, args, attempts = 1) => {
     // Releases. An outage or gateway timeout is retried instead of failing the
     // whole installer build.
     if (attempt >= attempts) throw new Error(failure);
-    console.warn(`${failure}; retrying (${attempt}/${attempts - 1}) in 30s`);
-    spawnSync('sleep', ['30']);
+    console.warn(`${failure}; retrying (${attempt}/${attempts - 1}) in ${delaySeconds}s`);
+    spawnSync('sleep', [String(delaySeconds)]);
   }
 };
 const exists = async file => { try { await access(file); return true; } catch { return false; } };
@@ -23,6 +23,9 @@ run(process.execPath, ['scripts/prepare.mjs', 'ios']);
 const project = await exists('ios/App/App.xcworkspace/contents.xcworkspacedata') ? ['-workspace', 'ios/App/App.xcworkspace'] : ['-project', 'ios/App/App.xcodeproj'];
 const common = [...project, '-scheme', 'App', '-configuration', 'Release', '-destination', 'generic/platform=iOS', 'IPHONEOS_DEPLOYMENT_TARGET=27.0'];
 await mkdir('output', {recursive: true});
+// Resolve the Swift packages first: the download is the part that fails during
+// a GitHub release outage, and a retry here is fast compared with a full build.
+run('xcodebuild', [...common, '-derivedDataPath', '.build/ios', '-resolvePackageDependencies'], 12, 30);
 if (process.env.IOS_EXPORT_OPTIONS_PLIST) {
   if (!process.env.APPLE_TEAM_ID) throw new Error('APPLE_TEAM_ID is required for a signed iOS export');
   await access(process.env.IOS_EXPORT_OPTIONS_PLIST);
@@ -34,7 +37,7 @@ if (process.env.IOS_EXPORT_OPTIONS_PLIST) {
   console.log('Created signed iOS export in output/ios-signed.');
 } else {
   if (process.env.REQUIRE_SIGNING === '1') throw new Error('Signed iOS export requested, but IOS_EXPORT_OPTIONS_PLIST is missing');
-  run('xcodebuild', [...common, '-derivedDataPath', '.build/ios', 'CODE_SIGNING_ALLOWED=NO', 'CODE_SIGNING_REQUIRED=NO', 'CODE_SIGN_IDENTITY=', 'build'], 5);
+  run('xcodebuild', [...common, '-derivedDataPath', '.build/ios', 'CODE_SIGNING_ALLOWED=NO', 'CODE_SIGNING_REQUIRED=NO', 'CODE_SIGN_IDENTITY=', 'build'], 3, 30);
   const built = '.build/ios/Build/Products/Release-iphoneos/App.app';
   await access(`${built}/App`);
   const contents = await readFile(`${built}/public/asset-manifest.json`, 'utf8');

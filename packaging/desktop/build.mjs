@@ -71,8 +71,8 @@ for (let attempt = 1; ; attempt++) {
     await build(builderOptions);
     break;
   } catch (error) {
-    if (attempt >= 4) throw error;
-    console.warn(`${error.message}; retrying (${attempt}/3) in 30s`);
+    if (attempt >= 6) throw error;
+    console.warn(`${error.message}; retrying (${attempt}/5) in 30s`);
     // A failed download can leave a half-written artifact that makes the next
     // attempt fail differently; start from a clean output and DMG helper cache.
     await rm(path.join(root, 'dist'), {recursive: true, force: true});
