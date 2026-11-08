@@ -174,7 +174,14 @@ function pauseHost(paused){
 }
 function mode(value){
   document.body.dataset.mode=value;
-  $('launcher').hidden=value==='game';$('game-view').hidden=value!=='game';
+  // A live WebGL canvas must stay in the render tree. iOS drops the context,
+  // and the process, if this view is display:none while a game is running.
+  const coverRunningGame=isRunning()&&value!=='game';
+  $('launcher').hidden=value==='game';
+  $('game-view').classList.toggle('suspended',coverRunningGame);
+  $('game-view').hidden=value!=='game'&&!coverRunningGame;
+  if(coverRunningGame)$('game-view').setAttribute('aria-hidden','true');
+  else $('game-view').removeAttribute('aria-hidden');
   clearInput();updateTouch();
   if(isRunning())pauseHost(value!=='game'||document.hidden);
   paintFps(true);
