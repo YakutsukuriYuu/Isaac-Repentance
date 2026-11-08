@@ -39,7 +39,7 @@ if (arch === process.arch) {
     if (installed === expected) electronDist = path.join(root, 'node_modules/electron/dist');
   } catch { /* electron-builder downloads the pinned distribution on clean CI. */ }
 }
-await build({
+const builderOptions = {
   projectDir: root,
   targets: Platform.MAC.createTarget(directory ? 'dir' : 'dmg', arch === 'arm64' ? Arch.arm64 : Arch.x64),
   publish: 'never',
@@ -62,4 +62,16 @@ await build({
     },
     dmg: {format: 'ULFO', writeUpdateInfo: false},
   },
-});
+};
+// electron-builder downloads Electron and the DMG helper from GitHub Releases.
+// Retry a gateway timeout there instead of failing the installer build.
+for (let attempt = 1; ; attempt++) {
+  try {
+    await build(builderOptions);
+    break;
+  } catch (error) {
+    if (attempt >= 4) throw error;
+    console.warn(`${error.message}; retrying (${attempt}/3) in 30s`);
+    await new Promise(resolve => setTimeout(resolve, 30000));
+  }
+}
