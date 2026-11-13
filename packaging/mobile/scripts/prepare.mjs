@@ -211,6 +211,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, WKScriptMessageHandler,
     private var frameRateLink: CADisplayLink?
     private var folderPickerInstalled = false
     private var folderPickId: String?
+    private var consolePromptId: String?
     private let folderImportLimit = 256 * 1024 * 1024
     private let folderFileLimit = 128 * 1024 * 1024
     private let folderCountLimit = 10000
@@ -256,10 +257,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, WKScriptMessageHandler,
     private func installFolderPicker() {
         guard !folderPickerInstalled, let webView = bridgeWebView() else { return }
         webView.configuration.userContentController.add(self, name: "isaacPickModFolder")
+        webView.configuration.userContentController.add(self, name: "isaacConsoleInput")
         folderPickerInstalled = true
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        if message.name == "isaacConsoleInput" {
+            presentConsolePrompt(message.body as? [String: Any])
+            return
+        }
         guard message.name == "isaacPickModFolder" else { return }
         let body = message.body as? [String: Any]
         let id = body?["id"] as? String ?? ""
@@ -347,6 +353,46 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, WKScriptMessageHandler,
         if let token { payload["token"] = token; payload["files"] = files }
         guard let data = try? JSONSerialization.data(withJSONObject: payload), let json = String(data: data, encoding: .utf8) else { return }
         webView.evaluateJavaScript("window.isaacModFolderResult(\\(json))", completionHandler: nil)
+    }
+
+    // The game keeps a live WebGL surface. Presenting the WebView keyboard over
+    // it makes WebKit resize and scroll the page, which can kill the web process
+    // on device. Collect console text with a native alert instead.
+    private func presentConsolePrompt(_ body: [String: Any]?) {
+        let id = body?["id"] as? String ?? ""
+        let initial = body?["value"] as? String ?? ""
+        DispatchQueue.main.async {
+            guard self.consolePromptId == nil, !id.isEmpty, let presenter = self.window?.rootViewController else {
+                self.finishConsolePrompt(id: id, text: nil)
+                return
+            }
+            self.consolePromptId = id
+            let alert = UIAlertController(title: "控制台命令", message: nil, preferredStyle: .alert)
+            alert.addTextField { field in
+                field.text = initial
+                field.autocapitalizationType = .none
+                field.autocorrectionType = .no
+                field.spellCheckingType = .no
+                field.keyboardType = .asciiCapable
+                field.clearButtonMode = .whileEditing
+            }
+            alert.addAction(UIAlertAction(title: "取消", style: .cancel) { _ in
+                self.finishConsolePrompt(id: id, text: nil)
+            })
+            alert.addAction(UIAlertAction(title: "执行", style: .default) { _ in
+                self.finishConsolePrompt(id: id, text: alert.textFields?.first?.text ?? "")
+            })
+            presenter.present(alert, animated: true)
+        }
+    }
+
+    private func finishConsolePrompt(id: String, text: String?) {
+        consolePromptId = nil
+        guard let webView = bridgeWebView() else { return }
+        var payload: [String: Any] = ["id": id]
+        if let text { payload["text"] = text } else { payload["cancelled"] = true }
+        guard let data = try? JSONSerialization.data(withJSONObject: payload), let json = String(data: data, encoding: .utf8) else { return }
+        webView.evaluateJavaScript("window.isaacConsolePrompt(\\(json))", completionHandler: nil)
     }
 
     private func keepWebViewFromBouncing() {

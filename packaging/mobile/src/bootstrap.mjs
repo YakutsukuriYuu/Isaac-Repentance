@@ -33,6 +33,15 @@ function bytesFromBase64(value) {
 }
 const folderPicks = new Map();
 let folderPickId = 0;
+const consolePrompts = new Map();
+let consolePromptId = 0;
+globalThis.isaacConsolePrompt = payload => {
+  const pending = consolePrompts.get(payload?.id);
+  if (!pending) return;
+  consolePrompts.delete(payload.id);
+  if (payload.cancelled) pending.resolve(null);
+  else pending.resolve(typeof payload.text === 'string' ? payload.text : '');
+};
 globalThis.isaacModFolderResult = payload => {
   const pending = folderPicks.get(payload?.id);
   if (!pending) return;
@@ -44,6 +53,14 @@ globalThis.isaacModFolderResult = payload => {
 globalThis.IsaacNative = Object.freeze({
   isNative: true,
   platform: Capacitor.getPlatform(),
+  async promptConsoleText(initial = '') {
+    if (Capacitor.getPlatform() !== 'ios' || !globalThis.webkit?.messageHandlers?.isaacConsoleInput) return null;
+    const id = `console-${++consolePromptId}`;
+    return new Promise((resolve, reject) => {
+      consolePrompts.set(id, {resolve, reject});
+      globalThis.webkit.messageHandlers.isaacConsoleInput.postMessage({id, value: initial});
+    });
+  },
   async pickModFolder() {
     if (Capacitor.getPlatform() !== 'ios' || !globalThis.webkit?.messageHandlers?.isaacPickModFolder) {
       throw new Error('此系统不能直接选择文件夹，请把 Mod 打成 ZIP 再导入。');

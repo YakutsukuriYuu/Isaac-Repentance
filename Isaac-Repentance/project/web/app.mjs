@@ -59,6 +59,9 @@ function persistSettings(layout=currentLayout){
 function rememberSettings(){persistSettings().catch(error=>{log(error);status(`设置保存失败：${error.message||error}`);});}
 function setInput(source,codes){if(codes.length)inputSources.set(source,new Set(codes));else inputSources.delete(source);keys.fill(0);for(const set of inputSources.values())for(const code of set)keys[code]=1;}
 const pads=createGamepadSource();
+// The iOS app collects console text with a native alert. Showing the WebView
+// keyboard over a live WebGL surface can kill the web process on device.
+const nativeConsole=globalThis.IsaacNative?.platform==='ios'&&typeof globalThis.IsaacNative.promptConsoleText==='function';
 const touch=createTouchControls({root:$('touch'),onPad:state=>{pads.setTouch(state);pads.publish(game);}});
 const touchLayout=createTouchLayout({root:$('touch'),editor:$('touch-layout-editor'),
   initialValue:currentLayout,onSave:value=>persistSettings(value),listenToStorage:!diskStorage,
@@ -110,7 +113,7 @@ function updateConsoleInput(){
   if(open)consoleOpening=false;
   if(!open)consoleClosing=false;
   if(consoleOpening&&(game.isaacState.frames||0)-consoleOpeningFrame>120)consoleOpening=false;
-  const visible=isRunning()&&document.body.dataset.mode==='game'&&$('console-enabled').checked&&$('touch-enabled').checked&&!consoleClosing&&(open||consoleOpening);
+  const visible=!nativeConsole&&isRunning()&&document.body.dataset.mode==='game'&&$('console-enabled').checked&&$('touch-enabled').checked&&!consoleClosing&&(open||consoleOpening);
   const panel=$('console-input-panel');
   if(panel.hidden===visible){panel.hidden=!visible;if(!visible&&panel.contains(document.activeElement))$('console-command').blur();}
   const submitDisabled=consoleSending||!open;
@@ -133,8 +136,30 @@ async function consoleKey(code){
   try{setInput(source,[code]);return await consoleFrames(3);}
   finally{setInput(source,[]);}
 }
+async function nativeConsoleCommand(){
+  if(game.isaacState.consoleOpen){await consoleKey(256);updateConsoleInput();return;}
+  consoleOpening=true;consoleClosing=false;consoleOpeningFrame=game.isaacState.frames||0;
+  if(!await consoleKey(96)||!game.isaacState.consoleOpen){consoleOpening=false;updateConsoleInput();return;}
+  updateConsoleInput();
+  let text;
+  try{text=await globalThis.IsaacNative.promptConsoleText();}
+  catch(error){log(error);return;}
+  if(text===null)return;
+  text=text.trim();
+  if(!text)return;
+  if(text.length>256||/[^\x20-\x7e]/.test(text)){status('请输入不超过 256 个字符的英文命令，可包含数字和符号。',true);return;}
+  const generation=consoleGeneration;
+  game.isaacTextInput.push(...Array.from(text,char=>char.charCodeAt(0)));
+  const deadline=performance.now()+5000;
+  while(game.isaacTextInput.length){
+    if(performance.now()>deadline||!await consoleFrames(1,generation)||!game.isaacState.consoleOpen)break;
+  }
+  await consoleKey(257);
+  updateConsoleInput();
+}
 $('touch').querySelector('[data-key="96"]').addEventListener('pointerdown',event=>{
   if(!isRunning()||!$('console-enabled').checked||!$('touch-enabled').checked||(event.pointerType==='mouse'&&event.button!==0))return;
+  if(nativeConsole){void nativeConsoleCommand();return;}
   consoleOpening=!game.isaacState.consoleOpen;consoleClosing=false;consoleOpeningFrame=game.isaacState.frames||0;
   updateConsoleInput();$('console-command').focus({preventScroll:true});
   // Keep the opening key sampled even if the soft keyboard resizes the viewport.
