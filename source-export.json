@@ -63,8 +63,8 @@
     },
     {
       "path": "Isaac-Repentance/project/web/app.mjs",
-      "bytes": 42927,
-      "sha256": "43784a890e7abf5a4731daaf11b80c740d9e2f7e09966f28c95efaeb8737b04a"
+      "bytes": 43760,
+      "sha256": "16cdc4a4300d6f779143e71332d91bbd1d09694b2978e21f41ea134aef33bc08"
     },
     {
       "path": "Isaac-Repentance/project/web/disk_storage.mjs",
@@ -90,6 +90,11 @@
       "path": "Isaac-Repentance/project/web/mod_helpers.mjs",
       "bytes": 15526,
       "sha256": "79ca6aa162d311f6fcdd71e93bc39bc27b82ea350b5438d4d28350576d5206c3"
+    },
+    {
+      "path": "Isaac-Repentance/project/web/remote_assets.mjs",
+      "bytes": 4254,
+      "sha256": "946558446b5c8b7f137ac812fa2f1faf2cca7996694c7d0404e3a03d5fc52fe6"
     },
     {
       "path": "Isaac-Repentance/project/web/save_helpers.mjs",
@@ -189,12 +194,12 @@
     {
       "path": "packaging/desktop/package-lock.json",
       "bytes": 127584,
-      "sha256": "967f67ef9cd1eba4b459f21bf259bb35054aeb258c11f21648c3925cc0aad207"
+      "sha256": "b3fa183adbc561814c54d8280935931e391c0fa55441a58bf7f1de52c2b15979"
     },
     {
       "path": "packaging/desktop/package.json",
       "bytes": 549,
-      "sha256": "f30ccd371b233fb032b818bd4b1347856ea900aac16fb6f6c903b68fbe757580"
+      "sha256": "9299bae9682f787e90a274ee96dcd02682cfe71479814c47030fcfb8ac63d021"
     },
     {
       "path": "packaging/desktop/runtime-server.mjs",
@@ -229,12 +234,12 @@
     {
       "path": "packaging/mobile/package-lock.json",
       "bytes": 58636,
-      "sha256": "3f8e7d4f638eed9272e36a4ad5d6dccdf7f21ace44529c48a4d2d0712aba23af"
+      "sha256": "49d811fc7ca1a0b41acbad84908d0c019911a8381659cc53f128bc39afbb6025"
     },
     {
       "path": "packaging/mobile/package.json",
       "bytes": 663,
-      "sha256": "9ac72c73269a772fa3e4293fb4f20c87a681b5323114754f32815afd30524fef"
+      "sha256": "4cbfbe2713c0470979c72bfdf7b429d35ad5600b921638327acf41b31f690985"
     },
     {
       "path": "packaging/mobile/scripts/build-android.mjs",
@@ -288,8 +293,8 @@
     },
     {
       "path": "packaging/scripts/runtime_inputs.py",
-      "bytes": 16586,
-      "sha256": "2ef6e6c508f1d35fda18d757139389964ddde4c89245542424f6edca038f3244"
+      "bytes": 16620,
+      "sha256": "7e180415dd8c3ff752c552b21e719a8368fc8e72bf4ee6bb2c7cb77968977fcd"
     },
     {
       "path": "packaging/scripts/signing.py",

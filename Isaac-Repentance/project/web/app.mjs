@@ -5,6 +5,9 @@ import {createTouchControls} from './touch_controls.mjs';
 import {createGamepadSource} from './gamepad_input.mjs';
 import {createTouchLayout,TOUCH_LAYOUT_KEY} from './touch_layout.mjs';
 import {createFpsMetrics} from './fps_metrics.mjs';
+import {installLazyPack} from './remote_assets.mjs';
+
+const PACKED_DIR='resources/packed/';
 
 const $=id=>document.getElementById(id);
 const AUTO_SAVE_ERROR='自动保存失败，请打开菜单导出存档，并查看运行日志。';
@@ -59,9 +62,10 @@ function persistSettings(layout=currentLayout){
 function rememberSettings(){persistSettings().catch(error=>{log(error);status(`设置保存失败：${error.message||error}`);});}
 function setInput(source,codes){if(codes.length)inputSources.set(source,new Set(codes));else inputSources.delete(source);keys.fill(0);for(const set of inputSources.values())for(const code of set)keys[code]=1;}
 const pads=createGamepadSource();
+const iosNative=globalThis.IsaacNative?.platform==='ios'&&globalThis.IsaacNative.isNative===true;
 // The iOS app collects console text with a native alert. Showing the WebView
 // keyboard over a live WebGL surface can kill the web process on device.
-const nativeConsole=globalThis.IsaacNative?.platform==='ios'&&typeof globalThis.IsaacNative.promptConsoleText==='function';
+const nativeConsole=iosNative&&typeof globalThis.IsaacNative.promptConsoleText==='function';
 const touch=createTouchControls({root:$('touch'),onPad:state=>{pads.setTouch(state);pads.publish(game);}});
 const touchLayout=createTouchLayout({root:$('touch'),editor:$('touch-layout-editor'),
   initialValue:currentLayout,onSave:value=>persistSettings(value),listenToStorage:!diskStorage,
@@ -550,8 +554,18 @@ $('start').onclick=async()=>{
     saveChanges=createSaveChangeTracker(game.FS);
     persistentReady=true;updateStart();
     const files=manifest.files,total=files.reduce((sum,file)=>sum+file.size,0);let loaded=0;
+    // iOS: the packed archives are read on demand instead of being copied into
+    // the Wasm heap. Keeping all of them resident exceeded the web process
+    // memory limit on device.
+    const remotePacked=iosNative?files.filter(file=>file.path.startsWith(PACKED_DIR)):[];
+    if(remotePacked.length){
+      status('正在挂载游戏资源…');
+      installLazyPack(game.FS,'/game/'+PACKED_DIR,remotePacked.map(file=>({name:file.path.slice(PACKED_DIR.length),size:file.size,url:file.url})));
+    }
+    const isRemote=file=>remotePacked.length>0&&file.path.startsWith(PACKED_DIR);
     for(let i=0;i<files.length;i++){
       const file=files[i];status(`正在加载游戏资源 ${Math.round(loaded/total*100)}%`);
+      if(isRemote(file)){loaded+=file.size;$('progress').value=loaded/total;continue;}
       const response=await fetch(file.url);if(!response.ok)throw new Error(`读取 ${file.path} 失败：HTTP ${response.status}`);
       const bytes=new Uint8Array(await response.arrayBuffer());if(bytes.byteLength!==file.size)throw new Error(`资源长度不符：${file.path}`);
       const target='/game/'+file.path,cut=target.lastIndexOf('/');game.FS.mkdirTree(target.slice(0,cut));game.FS.createDataFile(target.slice(0,cut),target.slice(cut+1),bytes,true,false,true);
