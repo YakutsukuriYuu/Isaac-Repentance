@@ -8,6 +8,10 @@ import {createFpsMetrics} from './fps_metrics.mjs';
 import {installLazyPack} from './remote_assets.mjs';
 
 const PACKED_DIR='resources/packed/';
+// Cutscenes and music are read in long bursts. Fetching them block by block
+// costs too much CPU time (iOS kills a web process that spends over 50% CPU),
+// so they stay resident while the other archives load on demand.
+const RESIDENT_PACKED=/^(videos|music)\.a$/;
 
 const $=id=>document.getElementById(id);
 const AUTO_SAVE_ERROR='自动保存失败，请打开菜单导出存档，并查看运行日志。';
@@ -557,12 +561,12 @@ $('start').onclick=async()=>{
     // iOS: the packed archives are read on demand instead of being copied into
     // the Wasm heap. Keeping all of them resident exceeded the web process
     // memory limit on device.
-    const remotePacked=iosNative?files.filter(file=>file.path.startsWith(PACKED_DIR)):[];
+    const remotePacked=iosNative?files.filter(file=>file.path.startsWith(PACKED_DIR)&&!RESIDENT_PACKED.test(file.path.slice(PACKED_DIR.length))):[];
     if(remotePacked.length){
       status('正在挂载游戏资源…');
       installLazyPack(game.FS,'/game/'+PACKED_DIR,remotePacked.map(file=>({name:file.path.slice(PACKED_DIR.length),size:file.size,url:file.url})));
     }
-    const isRemote=file=>remotePacked.length>0&&file.path.startsWith(PACKED_DIR);
+    const isRemote=file=>remotePacked.length>0&&file.path.startsWith(PACKED_DIR)&&!RESIDENT_PACKED.test(file.path.slice(PACKED_DIR.length));
     for(let i=0;i<files.length;i++){
       const file=files[i];status(`正在加载游戏资源 ${Math.round(loaded/total*100)}%`);
       if(isRemote(file)){loaded+=file.size;$('progress').value=loaded/total;continue;}

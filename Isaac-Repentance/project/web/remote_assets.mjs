@@ -62,16 +62,23 @@ export function installLazyPack(FS, dir, files, options = {}) {
     const from = Math.max(0, start);
     const to = Math.min(end, file.size);
     if (stats.touched.length < 30) stats.touched.push(`${file.name} ${from}+${Math.max(0, to - from)}`);
-    const out = new Uint8Array(Math.max(0, to - from));
-    let at = from;
-    let written = 0;
+    if (to <= from) return new Uint8Array(0);
+    // Fast path: a read inside one block is served as a view, with no copy.
+    const firstIndex = Math.floor(from / blockSize);
+    const first = readBlock(file, firstIndex);
+    const within = from - firstIndex * blockSize;
+    if (within + (to - from) <= first.length) return first.subarray(within, within + (to - from));
+    const out = new Uint8Array(to - from);
+    out.set(first.subarray(within), 0);
+    let at = from + (first.length - within);
+    let written = first.length - within;
     while (at < to) {
       const blockIndex = Math.floor(at / blockSize);
       const block = readBlock(file, blockIndex);
-      const within = at - blockIndex * blockSize;
-      const take = Math.min(to - at, block.length - within);
+      const offset = at - blockIndex * blockSize;
+      const take = Math.min(to - at, block.length - offset);
       if (take <= 0) break;
-      out.set(block.subarray(within, within + take), written);
+      out.set(block.subarray(offset, offset + take), written);
       at += take;
       written += take;
     }
